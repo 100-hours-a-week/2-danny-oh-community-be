@@ -1,5 +1,5 @@
 // controllers/userController.js
-const { getAllUsers, postUser } = require('../models/userModel');
+const { getAllUsers, postUser, updateUser, deleteUser } = require('../models/userModel');
 
 const getUsers = (req, res) => {
     getAllUsers((err, users) => {
