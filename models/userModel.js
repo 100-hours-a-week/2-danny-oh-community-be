@@ -1,43 +1,35 @@
-// models/userModel.js
-const db = require('../db');
+const fs = require('fs');
+const path = require('path');
+const usersFilePath = path.join(__dirname, '../users.json');
 
-const getAllUsers = (callback) => {
-    const sql = 'SELECT * FROM member';
-    db.query(sql, (err, results) => {
-        if (err) return callback(err); // 오류 처리
-        callback(null, results);
-    });
+// 사용자 데이터 로드 함수
+function loadUsers() {
+    if (!fs.existsSync(usersFilePath)) {
+        fs.writeFileSync(usersFilePath, JSON.stringify([]));
+    }
+    const data = fs.readFileSync(usersFilePath);
+    return JSON.parse(data);
+}
+
+// 사용자 데이터 저장 함수
+function saveUsers(users) {
+    fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
+}
+
+function findUserByEmail(email) {
+    const users = loadUsers();
+    return users.find(user => user.email === email);
+}
+
+function addUser(user) {
+    const users = loadUsers();
+    users.push(user);
+    saveUsers(users);
+}
+
+module.exports = {
+    loadUsers,
+    saveUsers,
+    findUserByEmail,
+    addUser
 };
-
-const postUser = (userData, callback) => {
-    const sql = 'INSERT INTO member (email, password, nickname) VALUES (?, ?, ?)';
-    const values = [userData.email, userData.password, userData.nickname]; // 사용자의 정보
-
-    db.query(sql, values, (err, results) => {
-        if (err) return callback(err); // 오류 처리
-        callback(null, results); // 삽입 결과 반환
-    });
-};
-
-
-const updateUser = (userData, callback) => {
-    const sql = 'UPDATE member SET email = ?, password = ?, nickname = ? WHERE id = ?';
-    const values = [userData.email, userData.password, userData.nickname, userData.id];
-
-    db.query(sql, values, (err, results) => {
-        if (err) return callback(err);
-        callback(null, results);
-    });
-};
-
-const deleteUser = (id, callback) => {
-    const sql = 'DELETE FROM member WHERE id = ?';
-
-    db.query(sql, [id], (err, results) => {
-        if (err) return callback(err);
-        callback(null, results);
-    });
-};
-
-
-module.exports = { getAllUsers, postUser, updateUser, deleteUser };
