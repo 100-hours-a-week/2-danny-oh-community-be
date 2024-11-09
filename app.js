@@ -3,8 +3,9 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 
-const userRoutes = require('./routes/users');
-const restRoutes = require('./routes/rest');
+const userRoutes = require('./routes/user');
+const postRoutes = require('./routes/post');
+const commentRoutes = require('./routes/comment');
 
 const app = express();
 const PORT = 3000;
@@ -44,8 +45,9 @@ function authorize(req, res, next) {
 }
 
 // /users 경로에 대한 라우트 설정
-app.use('/users', userRoutes);
-app.use('/rest', restRoutes);
+app.use('/user', userRoutes);
+app.use('/posts', postRoutes);
+app.use('/posts', commentRoutes);
 
 app.post('/login', (req, res) => {
     const { username, role } = req.body; // 클라이언트로부터 username과 role을 받음
