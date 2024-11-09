@@ -11,9 +11,10 @@ const storage = multer.diskStorage({
         cb(null, uploadPath);
     },
     filename: function (req, file, cb) {
-        // 파일명 중복 방지를 위한 타임스탬프 추가
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+        // 클라이언트가 보낸 이메일을 파일명으로 사용
+        const email = req.body.email.replace(/[^\w\s]/gi, '');  // 특수문자 제거
+        // 이메일을 파일명으로 사용, 확장자는 파일 원본 그대로 유지
+        cb(null, email + path.extname(file.originalname));
     }
 });
 
@@ -38,8 +39,8 @@ const upload = multer({
 
 // 회원가입 라우트
 router.post('/signup', (req, res, next) => {
-    console.log(req.body);
-    upload(req, res, function(err) {
+    console.log(req.body);  // 이메일이 잘 넘어오는지 확인
+    upload(req, res, function (err) {
         if (err) {
             console.error('파일 업로드 에러:', err);
             return res.status(400).json({
