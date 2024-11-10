@@ -1,7 +1,6 @@
 // app.js
 const express = require('express');
 const path = require('path');
-const multer = require('multer');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const fs = require('fs');
@@ -13,7 +12,7 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 const authRoutes = require('./routes/auth');
-// const userRoutes = require('./routes/user');
+const userRoutes = require('./routes/user');
 // const postRoutes = require('./routes/post');
 // const commentRoutes = require('./routes/comment');
 
@@ -34,7 +33,7 @@ app.use(session({
 
 // 라우트 설정
 app.use('/auth', authRoutes);
-// app.use('/user', userRoutes);
+app.use('/user', userRoutes);
 // app.use('/post', postRoutes);
 // app.use('/post', commentRoutes);
 

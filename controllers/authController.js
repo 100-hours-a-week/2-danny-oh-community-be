@@ -56,18 +56,19 @@ const signUp = async (req, res) => {
 };
 
 const login = (req, res) => {
-    try{
+    try {
         const { email, password } = req.body;
-        console.log("Email:", email);  // 로그로 확인해 보세요.
-        console.log("Password:", password);
-
         const user = userModel.loadUsers().find(user => user.email === email && user.password === password);
 
         if (!user) {
             return res.status(400).json({ message: '잘못된 이메일 또는 비밀번호입니다.' });
         }
 
-        req.session.user = { email, role: user.role };
+        req.session.user = { 
+            email: user.email, 
+            nickname: user.nickname, 
+            profileImage: user.profileImage 
+        };
         res.json({ message: '로그인 성공!' });
     } catch (error) {
         console.error('로그인 에러:', error);
@@ -77,4 +78,5 @@ const login = (req, res) => {
         });
     }
 };
+
 module.exports = { signUp, login };
