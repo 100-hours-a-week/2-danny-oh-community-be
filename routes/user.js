@@ -8,6 +8,7 @@ router.get('/',authMiddleware, userController.getUser);
 router.patch('/',authMiddleware, userController.updateUserProfile);
 router.patch('/password',authMiddleware, userController.updateUserPass);
 router.delete('/',authMiddleware, userController.deleteUser);
+router.post('/logout', authMiddleware, userController.logout);
 
 
 module.exports = router;
