@@ -13,7 +13,7 @@ if (!fs.existsSync(uploadDir)) {
 
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
-// const postRoutes = require('./routes/post');
+const postRoutes = require('./routes/post');
 // const commentRoutes = require('./routes/comment');
 
 const app = express();
