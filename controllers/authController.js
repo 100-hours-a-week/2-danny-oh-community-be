@@ -40,7 +40,6 @@ const signUp = async (req, res) => {
             success: true,
             message: '회원가입이 완료되었습니다.',
             user: {
-                user_id: newUser.user_id,
                 email,
                 nickname,
                 profileImage
