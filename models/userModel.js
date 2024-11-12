@@ -16,6 +16,11 @@ function saveUsers(users) {
     fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
 }
 
+function findUserByEmail(email) {
+    const users = loadUsers();
+    return users.find(user => user.email === email);
+}
+
 function findUserByUserId(user_id) {
     const users = loadUsers();
     return users.find(user => user.user_id === user_id);
@@ -81,5 +86,7 @@ module.exports = {
     addUser,
     updateProfile,
     updatePassword,
-    deleteUser
+    deleteUser,
+    generateUserId,
+    findUserByEmail
 };

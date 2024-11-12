@@ -1,6 +1,6 @@
 const userModel = require('../models/userModel');
 
-const signUp = async (req, res) => {
+const signUp = async (req, res, new_id) => {
     try {
         console.log('회원가입 처리 시작', req.body);
         console.log('업로드된 파일:', req.file);
@@ -28,6 +28,7 @@ const signUp = async (req, res) => {
 
         // 새 사용자 추가
         const newUser = {
+            new_id,
             email,
             password,
             nickname,
@@ -65,7 +66,7 @@ const login = (req, res) => {
         }
 
         req.session.user = { 
-            user_id: newUser.user_id,
+            user_id: user.user_id,
             email: user.email, 
             nickname: user.nickname, 
             profileImage: user.profileImage 

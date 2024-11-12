@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const authController = require('../controllers/authController');
+const userModel = require('../models/userModel');
 const multer = require('multer');
 const path = require('path');
-const authController = require('../controllers/authController');
 
 // Multer 스토리지 설정
 const storage = multer.diskStorage({
@@ -11,10 +12,9 @@ const storage = multer.diskStorage({
         cb(null, uploadPath);
     },
     filename: function (req, file, cb) {
-        // 클라이언트가 보낸 이메일을 파일명으로 사용
-        const email = req.body.email.replace(/[^\w\s]/gi, '');  // 특수문자 제거
+        const new_id = userModel.generateUserId()
         // 이메일을 파일명으로 사용, 확장자는 파일 원본 그대로 유지
-        cb(null, email + path.extname(file.originalname));
+        cb(null, new_id + path.extname(file.originalname));
     }
 });
 
