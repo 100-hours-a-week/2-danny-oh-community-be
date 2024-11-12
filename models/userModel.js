@@ -35,7 +35,6 @@ function generateUserId() {
 
 function addUser(user) {
     const users = loadUsers();
-    user.user_id = generateUserId(); // user_id 생성
     users.push(user);
     saveUsers(users);
 }
