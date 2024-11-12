@@ -8,12 +8,12 @@ const path = require('path');
 // Multer 스토리지 설정
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const uploadPath = path.join(__dirname, '../uploads/profileImage');
+        const uploadPath = path.join(__dirname, '../uploads/profileImages');
         cb(null, uploadPath);
     },
     filename: function (req, file, cb) {
         const new_id = userModel.generateUserId()
-        // 이메일을 파일명으로 사용, 확장자는 파일 원본 그대로 유지
+        // user_id를 파일명으로 사용, 확장자는 파일 원본 그대로 유지
         cb(null, new_id + path.extname(file.originalname));
     }
 });
@@ -48,7 +48,6 @@ router.post('/signup', (req, res, next) => {
                 message: err.message || '파일 업로드 중 에러가 발생했습니다.'
             });
         }
-        
         // 파일 업로드 성공 후 회원가입 처리
         authController.signUp(req, res, next);
     });

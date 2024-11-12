@@ -1,6 +1,6 @@
 const userModel = require('../models/userModel');
 
-const signUp = async (req, res, new_id) => {
+const signUp = async (req, res) => {
     try {
         console.log('회원가입 처리 시작', req.body);
         console.log('업로드된 파일:', req.file);
@@ -14,7 +14,7 @@ const signUp = async (req, res, new_id) => {
                 message: '필수 항목이 누락되었습니다.'
             });
         }
-
+        
         // 이미지 경로 처리
         const profileImage = req.file ? req.file.path.replace(/\\/g, '/') : null;
 
@@ -25,10 +25,10 @@ const signUp = async (req, res, new_id) => {
                 message: '이미 존재하는 이메일입니다.'
             });
         }
-
+        const user_id = userModel.generateUserId();
         // 새 사용자 추가
         const newUser = {
-            new_id,
+            user_id,
             email,
             password,
             nickname,
