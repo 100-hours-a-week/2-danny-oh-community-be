@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const postsFilePath = path.join(__dirname, '../data/posts.json'); // 게시글 JSON 파일 경로
+const postsFilePath = path.join(__dirname, '../posts.json'); // 게시글 JSON 파일 경로
 
 // 게시글 데이터를 로드하는 함수
 function loadPostsData() {
@@ -31,7 +31,6 @@ function getAllPosts() {
 // 게시글 생성 함수
 function createPost(newPost) {
     const posts = loadPostsData();
-    newPost.post_id = generatePostId(); // user_id 생성
     posts.push(newPost);
     savePostsData(posts);
 }
@@ -43,11 +42,13 @@ function getPostById(postId) {
 }
 
 // 게시글 업데이트 함수
-function updatePost(postId, updatedData) {
+function updatePost(postId, title, content, postImage) {
     const posts = loadPostsData();
     const postIndex = posts.findIndex(post => post.post_id === postId);
     if (postIndex !== -1) {
-        posts[postIndex] = { ...posts[postIndex], ...updatedData };
+        posts[postIndex].title = title;
+        posts[postIndex].content = content;
+        posts[postIndex].postImage = postImage
         savePostsData(posts);
         return posts[postIndex];
     }
@@ -71,5 +72,6 @@ module.exports = {
     createPost,
     getPostById,
     updatePost,
-    deletePost
+    deletePost,
+    generatePostId
 };
