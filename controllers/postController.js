@@ -1,4 +1,6 @@
 const postModel = require('../models/postModel');
+const path = require('path');
+const fs = require('fs');
 
 // 모든 게시글 조회
 const loadPosts = (req, res) => {
@@ -31,8 +33,12 @@ const loadPosts = (req, res) => {
 // controllers/postController.js
 const createPost = (req, res) => {
     try {
+        console.log(req.body);
         const { title, content } = req.body;
 
+        // 이미지 경로 처리
+        const postImage = req.file ? req.file.path.replace(/\\/g, '/') : null;
+        const post_id = postModel.generatePostId()
         // 작성자 정보와 댓글 구조를 미리 설정
         const author = {
             user_id: req.session.user.user_id, // 세션에 저장된 user_id 사용
@@ -41,14 +47,16 @@ const createPost = (req, res) => {
         };
 
         const newPost = {
+            post_id,
             title,
             content,
+            postImage,
             like_cnt: 0,
             comment_cnt: 0,
             view_cnt: 0,
             author,
             created_at: new Date().toISOString(),
-            comments: [] // 기본적으로 빈 댓글 배열로 시작
+            comments: [], // 기본적으로 빈 댓글 배열로 시작
         };
 
         // 새 게시글 데이터 저장
@@ -81,8 +89,9 @@ const loadPostDetail = (req, res) => {
 const updatePostDetail = (req, res) => {
     try {
         const postId = parseInt(req.params.post_id, 10);
-        const updatedData = req.body;
-        const updatedPost = postModel.updatePost(postId, updatedData);
+        const { title, content } = req.body;
+        const postImage = req.file ? req.file.path.replace(/\\/g, '/') : null;
+        const updatedPost = postModel.updatePost(postId, title, content, postImage);
         if (!updatedPost) {
             return res.status(404).json({ message: "post_not_found" });
         }
