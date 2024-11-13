@@ -34,15 +34,16 @@ app.use(session({
     saveUninitialized: true,
     cookie: { secure: false, maxAge: 10 * 60 * 1000 }
 }));
-
+// 업로드된 이미지 제공 API
+const uploadDir = path.join(__dirname, 'uploads');
 
 
 // 라우트 설정
+app.use('/uploads', express.static(uploadDir));
 app.use('/auth', authRoutes);
 app.use('/user', userRoutes);
 app.use('/posts', postRoutes);
 app.use('/posts', commentRoutes);
-
 
 
 app.listen(PORT, () => {
