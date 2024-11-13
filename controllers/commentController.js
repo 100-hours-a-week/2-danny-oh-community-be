@@ -1,13 +1,10 @@
 const commentModel = require('../models/commentModel');
-const path = require('path');
-const fs = require('fs');
-
 // 댓글 생성
 const createComment = (req, res) => {
     try {
         console.log(req.body);
         const { content } = req.body;
-        const { post_id } = req.params;
+        const post_id = parseInt(req.params.post_id, 10);
 
         // 작성자 정보 설정
         const author = {
@@ -15,7 +12,7 @@ const createComment = (req, res) => {
             nickname: req.session.user.nickname,
             profileImage: req.session.user.profileImage || null
         };
-
+        const comment_id = commentModel.generateCommentId(post_id);
         const newComment = {
             comment_id,
             content,
@@ -42,7 +39,7 @@ const updateComment = (req, res) => {
         const { content } = req.body;
         const updatedPost = commentModel.editComment(post_id, comment_id, content);
         if (!updatedPost) {
-            return res.status(404).json({ message: "comment_ not_ found" });
+            return res.status(404).json({ message: "comment_not_found" });
         }
         res.status(200).json({ message: "comment_updated_success", data: updatedPost });
     } catch (error) {
