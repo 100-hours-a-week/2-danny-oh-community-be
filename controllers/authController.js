@@ -1,4 +1,5 @@
 const userModel = require('../models/userModel');
+const path = require('path');
 
 const signUp = async (req, res) => {
     try {

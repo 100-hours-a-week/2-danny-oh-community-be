@@ -1,6 +1,5 @@
 const postModel = require('../models/postModel');
 const path = require('path');
-const fs = require('fs');
 
 // 모든 게시글 조회
 const loadPosts = (req, res) => {
