@@ -1,3 +1,4 @@
+const path = require('path');
 const postsFilePath = path.join(__dirname, '../posts.json'); // 게시글 JSON 파일 경로
 
 // 댓글 데이터를 저장하는 함수
