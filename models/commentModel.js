@@ -1,5 +1,17 @@
+const fs = require('fs');
 const path = require('path');
 const postsFilePath = path.join(__dirname, '../posts.json'); // 게시글 JSON 파일 경로
+
+
+
+// 게시글 데이터를 로드하는 함수
+function loadPostsData() {
+    if (!fs.existsSync(postsFilePath)) {
+        fs.writeFileSync(postsFilePath, JSON.stringify([]));
+    }
+    const data = fs.readFileSync(postsFilePath);
+    return JSON.parse(data);
+}
 
 // 댓글 데이터를 저장하는 함수
 function savePostsData(posts) {
@@ -11,20 +23,37 @@ function getCommentById(post_id, comment_id){
     const postIndex = posts.findIndex(post => post.post_id === post_id);
     return posts[postIndex].comments.find(comment => comment.comment_id === comment_id);
 }
-// 특정 게시글 조회 함수
-function getPostById(postId) {
+
+// 마지막 comment_id를 확인하여 +1을 반환하는 함수
+function generateCommentId(post_id) {
     const posts = loadPostsData();
-    return posts.find(post => post.post_id === postId);
+    
+    // post_id에 해당하는 게시글 찾기
+    const post = posts.find(post => post.post_id === post_id);
+    
+    // 해당 post가 없거나 comments 배열이 없을 경우 예외 처리
+    if (!post || !post.comments) {
+        return 1; // 첫 번째 댓글은 1로 설정
+    }
+
+    const comments = post.comments;
+    const lastComment = comments[comments.length - 1];
+    
+    // 마지막 댓글의 comment_id에 +1 반환, 또는 댓글이 없다면 1 반환
+    return lastComment ? lastComment.comment_id + 1 : 1;
 }
 
 // 댓글 추가 함수
-function addComment(post_id, comment) {
+function addComment(post_id, newComment) {
+    console.log(newComment);
     const posts = loadPostsData();
     const postIndex = posts.findIndex(post => post.post_id === post_id);
+    console.log(posts[postIndex]);
     if (postIndex !== -1) {
-        posts[postIndex].comments.push(comment)
+        console.log(posts[postIndex]);
+        posts[postIndex].comments.push(newComment)
         savePostsData(posts);
-        return posts[postIndex].comment;
+        return posts[postIndex].comments;
     }
     return null;
 }
@@ -60,5 +89,6 @@ module.exports = {
     getCommentById,
     addComment,
     editComment,
-    deleteComment
+    deleteComment,
+    generateCommentId
 };
