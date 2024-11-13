@@ -16,11 +16,14 @@ function savePostsData(posts) {
     fs.writeFileSync(postsFilePath, JSON.stringify(posts, null, 2));
 }
 
-// 마지막 post_id를 가져와서 1 증가시키는 함수
+// 마지막 post_id를 확인하여 +1을 반환하는 함수
 function generatePostId() {
     const posts = loadPostsData();
+    
+    // posts 배열이 비어있다면 첫 번째 post_id는 1로 설정
     const lastPost = posts[posts.length - 1];
-    return lastPost ? lastPost.post_id + 1 : 1; // 첫 번째 사용자는 1로 설정
+    
+    return lastPost ? lastPost.post_id + 1 : 1;
 }
 
 // 게시글 전체 조회 함수
