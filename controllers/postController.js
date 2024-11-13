@@ -37,7 +37,7 @@ const createPost = (req, res) => {
         const { title, content } = req.body;
 
         // 이미지 경로 처리
-        const postImage = req.file ? req.file.path.replace(/\\/g, '/') : null;
+        const postImage = req.file ? `/uploads/postImage/${path.extname(req.file.originalname)}` : null;
         const post_id = postModel.generatePostId()
         // 작성자 정보와 댓글 구조를 미리 설정
         const author = {
@@ -90,7 +90,7 @@ const updatePostDetail = (req, res) => {
     try {
         const postId = parseInt(req.params.post_id, 10);
         const { title, content } = req.body;
-        const postImage = req.file ? req.file.path.replace(/\\/g, '/') : null;
+        const postImage = req.file ? `/uploads/postImage/${path.extname(req.file.originalname)}` : null;
         const updatedPost = postModel.updatePost(postId, title, content, postImage);
         if (!updatedPost) {
             return res.status(404).json({ message: "post_not_found" });
