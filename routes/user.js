@@ -9,13 +9,13 @@ const path = require('path');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        const uploadPath = path.join(__dirname, '../uploads/profileImage');
+        const uploadPath = path.join(__dirname, '../uploads/profileImages');
         cb(null, uploadPath);
     },
     filename: function (req, file, cb) {
-        const { email } = req.session.user; 
+        const { user_id } = req.session.user
         // 이메일을 파일명으로 사용, 확장자는 파일 원본 그대로 유지
-        cb(null, email.replace(/[^\w\s]/gi, '') + path.extname(file.originalname));
+        cb(null, user_id + path.extname(file.originalname));
     }
 });
 
