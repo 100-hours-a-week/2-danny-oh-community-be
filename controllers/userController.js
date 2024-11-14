@@ -27,7 +27,7 @@ const updateUserProfile = async (req, res) => {
         const { user_id } = req.session.user;
         const { nickname } = req.body;
         // 이미지 경로 처리
-        const profileImage = req.file ? `/uploads/profileImage/${req.file.filename}` : null;
+        const profileImage = req.file ? `/uploads/profileImages/${req.file.filename}` : null;
 
         // 사용자 정보를 업데이트하기 전에 기존 이미지 파일과 비교
         if (profileImage && req.session.user.profileImage && profileImage !== req.session.user.profileImage) {

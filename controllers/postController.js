@@ -36,7 +36,7 @@ const createPost = (req, res) => {
         const { title, content } = req.body;
 
         // 이미지 경로 처리
-        const postImage = req.file ? `/uploads/postImage/${req.file.filename}` : null;
+        const postImage = req.file ? `/uploads/postImages/${req.file.filename}` : null;
         const post_id = postModel.generatePostId()
         // 작성자 정보와 댓글 구조를 미리 설정
         const author = {
@@ -54,7 +54,7 @@ const createPost = (req, res) => {
             comment_cnt: 0,
             view_cnt: 0,
             author,
-            created_at: new Date().toISOString(),
+            created_at: new Date().toISOString().replace('T', ' ').slice(0, 19),
             comments: [], // 기본적으로 빈 댓글 배열로 시작
         };
 
@@ -89,7 +89,7 @@ const updatePostDetail = (req, res) => {
     try {
         const postId = parseInt(req.params.post_id, 10);
         const { title, content } = req.body;
-        const postImage = req.file ? `/uploads/postImage/${req.file.filename}` : null;
+        const postImage = req.file ? `/uploads/postImages/${req.file.filename}` : null;
         const updatedPost = postModel.updatePost(postId, title, content, postImage);
         if (!updatedPost) {
             return res.status(404).json({ message: "post_not_found" });
