@@ -60,7 +60,7 @@ const updateUserPass= (req, res) => {
         const { user_id } = req.session.user;
         const { newPassword } = req.body;
         userModel.updatePassword(user_id, newPassword);
-        res.status(200).json({ message: '비밀번호가 업데이트되었습니다.' });
+        res.status(204).json({ message: '비밀번호가 업데이트되었습니다.' });
     } catch (error) {
         console.error('비밀번호 업데이트 오류:', error);
         res.status(500).json({ message: '서버 오류가 발생했습니다.' });
