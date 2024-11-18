@@ -40,16 +40,16 @@ function addUser(user) {
 }
 
 // 사용자 프로필 업데이트 함수
-function updateProfile(user_id, nickname, profileImage) {
+function updateProfile(user_id, nickname, profileImage, imageFlag) {
     const users = loadUsers();
 
     // 사용자를 찾기
     const userIndex = users.findIndex(user => user.user_id === user_id);
-
     // 사용자 정보 업데이트
     users[userIndex].nickname = nickname;
-    users[userIndex].profileImage = profileImage;
-
+    if(imageFlag) {
+        users[userIndex].profileImage = profileImage;
+    }
     // 업데이트된 사용자 목록을 저장
     saveUsers(users);
 }

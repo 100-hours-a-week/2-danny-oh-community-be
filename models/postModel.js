@@ -45,13 +45,13 @@ function getPostById(postId) {
 }
 
 // 게시글 업데이트 함수
-function updatePost(postId, title, content, postImage) {
+function updatePost(postId, title, content, postImage, imageFlag) {
     const posts = loadPostsData();
     const postIndex = posts.findIndex(post => post.post_id === postId);
     if (postIndex !== -1) {
         posts[postIndex].title = title;
         posts[postIndex].content = content;
-        posts[postIndex].postImage = postImage
+        if(imageFlag) posts[postIndex].postImage = postImage;
         savePostsData(posts);
         return posts[postIndex];
     }

@@ -88,13 +88,13 @@ const loadPostDetail = (req, res) => {
 const updatePostDetail = (req, res) => {
     try {
         const postId = parseInt(req.params.post_id, 10);
-        const { title, content } = req.body;
+        const { title, content, imageFlag } = req.body;
         const postImage = req.file ? `/uploads/postImages/${req.file.filename}` : null;
-        const updatedPost = postModel.updatePost(postId, title, content, postImage);
+        const updatedPost = postModel.updatePost(postId, title, content, postImage, imageFlag);
         if (!updatedPost) {
             return res.status(404).json({ message: "post_not_found" });
         }
-        res.status(200).json({ message: "post_updated_success", data: updatedPost });
+        res.status(204).json({ message: "post_updated_success", data: updatedPost });
     } catch (error) {
         console.error("게시글 수정 오류:", error);
         res.status(500).json({ message: "internal_server_error" });
