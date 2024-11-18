@@ -21,7 +21,7 @@ function generatePostId() {
     const posts = loadPostsData();
     
     // posts 배열이 비어있다면 첫 번째 post_id는 1로 설정
-    const lastPost = posts[posts.length - 1];
+    const lastPost = posts[0];
     
     return lastPost ? lastPost.post_id + 1 : 1;
 }
@@ -34,7 +34,7 @@ function getAllPosts() {
 // 게시글 생성 함수
 function createPost(newPost) {
     const posts = loadPostsData();
-    posts.push(newPost);
+    posts.unshift(newPost);  // 최신 게시글을 배열 앞에 추가
     savePostsData(posts);
 }
 
