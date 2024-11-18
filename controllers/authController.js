@@ -17,7 +17,7 @@ const signUp = async (req, res) => {
         }
         
         // 이미지 경로 처리
-        const profileImage = req.file ? `/uploads/profileImage/${req.file.filename}` : null;
+        const profileImage = req.file ? `/uploads/profileImages/${req.file.filename}` : null;
 
         // 이메일 중복 체크
         if (userModel.findUserByEmail(email)) {

@@ -52,6 +52,7 @@ function addComment(post_id, newComment) {
     if (postIndex !== -1) {
         console.log(posts[postIndex]);
         posts[postIndex].comments.push(newComment)
+        posts[postIndex].comment_cnt += 1;
         savePostsData(posts);
         return posts[postIndex].comments;
     }
@@ -78,6 +79,7 @@ function deleteComment(post_id, comment_id){
     const initialLength = posts[postIndex].comments.length;
     posts[postIndex].comments = posts[postIndex].comments.filter(comment => comment.comment_id !== comment_id);
     if (posts[postIndex].comments.length < initialLength) {
+        posts[postIndex].comment_cnt -= 1;
         savePostsData(posts);
         return true;
     }

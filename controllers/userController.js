@@ -25,27 +25,25 @@ const logout = (req, res) => {
 const updateUserProfile = async (req, res) => {
     try {
         const { user_id } = req.session.user;
-        const { nickname } = req.body;
-        // 이미지 경로 처리
-        const profileImage = req.file ? `/uploads/profileImage/${req.file.filename}` : null;
+        const { nickname, imageFlag } = req.body;
+        let profileImage = req.file ? `/uploads/profileImages/${req.file.filename}` : null;
 
-        // 사용자 정보를 업데이트하기 전에 기존 이미지 파일과 비교
-        if (profileImage && req.session.user.profileImage && profileImage !== req.session.user.profileImage) {
-            // 기존 이미지 경로가 존재하고, 새 이미지 경로가 다르면 기존 파일 삭제
-            const oldProfileImagePath = path.join(__dirname, '..', req.session.user.profileImage);
-            if (fs.existsSync(oldProfileImagePath)) {
-                fs.unlinkSync(oldProfileImagePath);  // 기존 파일 삭제
-            }
+        // 이미지 변경이 요청된 경우
+        if (imageFlag && profileImage) {
+            // 세션에 새로운 프로필 이미지 경로 저장
+            req.session.user.profileImage = profileImage;
+        } else {
+            // 이미지 변경이 요청되지 않은 경우 기존 이미지를 유지
+            profileImage = req.session.user.profileImage || null;
         }
 
-        // 프로필 업데이트
-        userModel.updateProfile(user_id, nickname, profileImage);  
+        // 사용자 정보 업데이트
+        userModel.updateProfile(user_id, nickname, profileImage, imageFlag);
 
         // 세션에 최신 정보 반영
         req.session.user.nickname = nickname;
-        req.session.user.profileImage = profileImage;
 
-        res.status(200).json({ message: '프로필이 업데이트되었습니다.' });
+        res.status(204).json({ message: '프로필이 업데이트되었습니다.' });
     } catch (error) {
         console.error('프로필 업데이트 오류:', error);
         res.status(500).json({ message: '서버 오류가 발생했습니다.' });
@@ -60,7 +58,7 @@ const updateUserPass= (req, res) => {
         const { user_id } = req.session.user;
         const { newPassword } = req.body;
         userModel.updatePassword(user_id, newPassword);
-        res.status(200).json({ message: '비밀번호가 업데이트되었습니다.' });
+        res.status(204).json({ message: '비밀번호가 업데이트되었습니다.' });
     } catch (error) {
         console.error('비밀번호 업데이트 오류:', error);
         res.status(500).json({ message: '서버 오류가 발생했습니다.' });

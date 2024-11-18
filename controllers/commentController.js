@@ -17,7 +17,7 @@ const createComment = (req, res) => {
             comment_id,
             content,
             author,
-            created_at: new Date().toISOString(),
+            created_at: new Date().toISOString().replace('T', ' ').slice(0, 19),
         };
 
         // 새 댓글 데이터 저장
