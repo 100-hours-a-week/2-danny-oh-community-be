@@ -1,6 +1,4 @@
 const userModel = require('../models/userModel');
-const path = require('path');
-const fs = require('fs');
 
 const getUser = (req, res) => {
     try {
@@ -27,9 +25,10 @@ const updateUserProfile = async (req, res) => {
         const { user_id } = req.session.user;
         const { nickname, imageFlag } = req.body;
         let profileImage = req.file ? `/uploads/profileImages/${req.file.filename}` : null;
-
+        console.log(imageFlag);
         // 이미지 변경이 요청된 경우
-        if (imageFlag && profileImage) {
+        if (imageFlag == 1) {
+            console.log(imageFlag);
             // 세션에 새로운 프로필 이미지 경로 저장
             req.session.user.profileImage = profileImage;
         } else {

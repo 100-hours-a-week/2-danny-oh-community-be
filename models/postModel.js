@@ -51,7 +51,7 @@ function updatePost(postId, title, content, postImage, imageFlag) {
     if (postIndex !== -1) {
         posts[postIndex].title = title;
         posts[postIndex].content = content;
-        if(imageFlag) posts[postIndex].postImage = postImage;
+        if(imageFlag == 1) posts[postIndex].postImage = postImage;
         savePostsData(posts);
         return posts[postIndex];
     }
