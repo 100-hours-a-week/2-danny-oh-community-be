@@ -47,7 +47,7 @@ function updateProfile(user_id, nickname, profileImage, imageFlag) {
     const userIndex = users.findIndex(user => user.user_id === user_id);
     // 사용자 정보 업데이트
     users[userIndex].nickname = nickname;
-    if(imageFlag) {
+    if(imageFlag == 1) {
         users[userIndex].profileImage = profileImage;
     }
     // 업데이트된 사용자 목록을 저장
