@@ -1,5 +1,12 @@
-const userModel = require('../models/userModel');
-const path = require('path');
+import {
+    loadUsersModel,
+    findUserByUserIdModel,
+    addUserModel,
+    updateProfileModel,
+    updatePasswordModel,
+    deleteUserModel,
+    generateUserIdModel,
+    findUserByEmailModel } from '../models/userModel.js';
 
 const signUp = async (req, res) => {
     try {
@@ -20,13 +27,13 @@ const signUp = async (req, res) => {
         const profileImage = req.file ? `/uploads/profileImages/${req.file.filename}` : null;
 
         // 이메일 중복 체크
-        if (userModel.findUserByEmail(email)) {
+        if (findUserByEmailModel(email)) {
             return res.status(400).json({
                 success: false,
                 message: '이미 존재하는 이메일입니다.'
             });
         }
-        const user_id = userModel.generateUserId();
+        const user_id = generateUserIdModel();
         // 새 사용자 추가
         const newUser = {
             user_id,
@@ -60,7 +67,7 @@ const signUp = async (req, res) => {
 const login = (req, res) => {
     try {
         const { email, password } = req.body;
-        const user = userModel.loadUsers().find(user => user.email === email && user.password === password);
+        const user = loadUsersModel().find(user => user.email === email && user.password === password);
 
         if (!user) {
             return res.status(400).json({ message: '잘못된 이메일 또는 비밀번호입니다.' });
@@ -82,4 +89,4 @@ const login = (req, res) => {
     }
 };
 
-module.exports = { signUp, login };
+export { signUp, login };

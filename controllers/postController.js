@@ -1,10 +1,16 @@
-const postModel = require('../models/postModel');
-const path = require('path');
+import {
+    getAllPostsModel,
+    createPostModel,
+    getPostByIdModel,
+    updatePostModel,
+    deletePostModel,
+    generatePostIdModel
+} from '../models/postModel.js';
 
 // 모든 게시글 조회
 const loadPosts = (req, res) => {
     try {
-        const posts = postModel.getAllPosts();
+        const posts = getAllPostsModel();
         res.status(200).json({
             message: "posts_list_success",
             data: {
@@ -37,7 +43,7 @@ const createPost = (req, res) => {
 
         // 이미지 경로 처리
         const postImage = req.file ? `/uploads/postImages/${req.file.filename}` : null;
-        const post_id = postModel.generatePostId()
+        const post_id = generatePostIdModel()
         // 작성자 정보와 댓글 구조를 미리 설정
         const author = {
             user_id: req.session.user.user_id, // 세션에 저장된 user_id 사용
@@ -59,7 +65,7 @@ const createPost = (req, res) => {
         };
 
         // 새 게시글 데이터 저장
-        postModel.createPost(newPost);
+        createPostModel(newPost);
 
         res.status(201).json({ message: "post_created_success" });
     } catch (error) {
@@ -73,7 +79,7 @@ const createPost = (req, res) => {
 const loadPostDetail = (req, res) => {
     try {
         const postId = parseInt(req.params.post_id, 10);
-        const post = postModel.getPostById(postId);
+        const post = getPostByIdModel(postId);
         if (!post) {
             return res.status(404).json({ message: "post_not_found" });
         }
@@ -90,7 +96,7 @@ const updatePostDetail = (req, res) => {
         const postId = parseInt(req.params.post_id, 10);
         const { title, content, imageFlag } = req.body;
         const postImage = req.file ? `/uploads/postImages/${req.file.filename}` : null;
-        const updatedPost = postModel.updatePost(postId, title, content, postImage, imageFlag);
+        const updatedPost = updatePostModel(postId, title, content, postImage, imageFlag);
         if (!updatedPost) {
             return res.status(404).json({ message: "post_not_found" });
         }
@@ -105,7 +111,7 @@ const updatePostDetail = (req, res) => {
 const deletePost = (req, res) => {
     try {
         const postId = parseInt(req.params.post_id, 10);
-        const isDeleted = postModel.deletePost(postId);
+        const isDeleted = deletePostModel(postId);
         if (!isDeleted) {
             return res.status(404).json({ message: "post_not_found" });
         }
@@ -116,10 +122,4 @@ const deletePost = (req, res) => {
     }
 };
 
-module.exports = {
-    loadPosts,
-    createPost,
-    loadPostDetail,
-    updatePostDetail,
-    deletePost
-};
+export { loadPosts, createPost, loadPostDetail, updatePostDetail, deletePost };

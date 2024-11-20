@@ -1,4 +1,11 @@
-const commentModel = require('../models/commentModel');
+import {
+    getCommentByIdModel,
+    addCommentModel,
+    editCommentModel,
+    deleteCommentModel,
+    generateCommentIdModel
+} from '../models/commentModel.js';
+
 // 댓글 생성
 const createComment = (req, res) => {
     try {
@@ -12,7 +19,7 @@ const createComment = (req, res) => {
             nickname: req.session.user.nickname,
             profileImage: req.session.user.profileImage || null
         };
-        const comment_id = commentModel.generateCommentId(post_id);
+        const comment_id = generateCommentIdModel(post_id);
         const newComment = {
             comment_id,
             content,
@@ -21,7 +28,7 @@ const createComment = (req, res) => {
         };
 
         // 새 댓글 데이터 저장
-        commentModel.addComment(post_id, newComment);
+        addCommentModel(post_id, newComment);
 
         res.status(201).json({ message: "comment_create_success" });
     } catch (error) {
@@ -37,7 +44,7 @@ const updateComment = (req, res) => {
         const post_id = parseInt(req.params.post_id, 10);
         const comment_id = parseInt(req.params.comment_id, 10);
         const { content } = req.body;
-        const updatedPost = commentModel.editComment(post_id, comment_id, content);
+        const updatedPost = editCommentModel(post_id, comment_id, content);
         if (!updatedPost) {
             return res.status(404).json({ message: "comment_not_found" });
         }
@@ -53,7 +60,7 @@ const deleteComment = (req, res) => {
     try {
         const post_id = parseInt(req.params.post_id, 10);
         const comment_id = parseInt(req.params.comment_id, 10);
-        const isDeleted = commentModel.deleteComment(post_id, comment_id);
+        const isDeleted = deleteCommentModel(post_id, comment_id);
         if (!isDeleted) {
             return res.status(404).json({ message: "comment_not_found" });
         }
@@ -64,8 +71,4 @@ const deleteComment = (req, res) => {
     }
 };
 
-module.exports = {
-    createComment,
-    updateComment,
-    deleteComment
-};
+export { createComment, updateComment, deleteComment };

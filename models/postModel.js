@@ -1,9 +1,11 @@
-const fs = require('fs');
-const path = require('path');
-const postsFilePath = path.join(__dirname, '../posts.json'); // 게시글 JSON 파일 경로
+import fs from 'fs';
+import path from 'path';
+
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const postsFilePath = path.join(__dirname, '../posts.json');
 
 // 게시글 데이터를 로드하는 함수
-function loadPostsData() {
+function loadPostsDataModel() {
     if (!fs.existsSync(postsFilePath)) {
         fs.writeFileSync(postsFilePath, JSON.stringify([]));
     }
@@ -12,13 +14,13 @@ function loadPostsData() {
 }
 
 // 게시글 데이터를 저장하는 함수
-function savePostsData(posts) {
+function savePostsDataModel(posts) {
     fs.writeFileSync(postsFilePath, JSON.stringify(posts, null, 2));
 }
 
 // 마지막 post_id를 확인하여 +1을 반환하는 함수
-function generatePostId() {
-    const posts = loadPostsData();
+function generatePostIdModel() {
+    const posts = loadPostsDataModel();
     
     // posts 배열이 비어있다면 첫 번째 post_id는 1로 설정
     const lastPost = posts[0];
@@ -27,54 +29,54 @@ function generatePostId() {
 }
 
 // 게시글 전체 조회 함수
-function getAllPosts() {
-    return loadPostsData();
+function getAllPostsModel() {
+    return loadPostsDataModel();
 }
 
 // 게시글 생성 함수
-function createPost(newPost) {
-    const posts = loadPostsData();
+function createPostModel(newPost) {
+    const posts = loadPostsDataModel();
     posts.unshift(newPost);  // 최신 게시글을 배열 앞에 추가
-    savePostsData(posts);
+    savePostsDataModel(posts);
 }
 
 // 특정 게시글 조회 함수
-function getPostById(postId) {
-    const posts = loadPostsData();
+function getPostByIdModel(postId) {
+    const posts = loadPostsDataModel();
     return posts.find(post => post.post_id === postId);
 }
 
 // 게시글 업데이트 함수
-function updatePost(postId, title, content, postImage, imageFlag) {
-    const posts = loadPostsData();
+function updatePostModel(postId, title, content, postImage, imageFlag) {
+    const posts = loadPostsDataModel();
     const postIndex = posts.findIndex(post => post.post_id === postId);
     if (postIndex !== -1) {
         posts[postIndex].title = title;
         posts[postIndex].content = content;
         if(imageFlag == 1) posts[postIndex].postImage = postImage;
-        savePostsData(posts);
+        savePostsDataModel(posts);
         return posts[postIndex];
     }
     return null;
 }
 
 // 게시글 삭제 함수
-function deletePost(postId) {
-    let posts = loadPostsData();
+function deletePostModel(postId) {
+    let posts = loadPostsDataModel();
     const initialLength = posts.length;
     posts = posts.filter(post => post.post_id !== postId);
     if (posts.length < initialLength) {
-        savePostsData(posts);
+        savePostsDataModel(posts);
         return true;
     }
     return false;
 }
 
-module.exports = {
-    getAllPosts,
-    createPost,
-    getPostById,
-    updatePost,
-    deletePost,
-    generatePostId
+export {
+    getAllPostsModel,
+    createPostModel,
+    getPostByIdModel,
+    updatePostModel,
+    deletePostModel,
+    generatePostIdModel
 };
