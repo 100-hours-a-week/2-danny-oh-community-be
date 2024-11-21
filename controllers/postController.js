@@ -5,9 +5,13 @@ import {
     updatePostModel,
     deletePostModel,
 } from '../models/postModel.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-import { uploadPostImage } from '../utils/uploadPostUtils.js';
-
+// __dirname 설정
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 // 모든 게시글 조회
 const loadPosts = async (req, res) => {
     try {
@@ -87,6 +91,25 @@ const updatePostDetail = async (req, res) => {
         const postId = parseInt(req.params.post_id, 10);
         const { title, content, imageFlag } = req.body;
         const postImage = req.file ? `/uploads/postImages/${req.file.filename}` : null;
+
+        // 기존 게시글 데이터 가져오기
+        const existingPost = await getPostByIdModel(postId);
+        if (!existingPost) {
+            return res.status(404).json({ message: "post_not_found" });
+        }
+
+        // 기존 이미지 삭제
+        if (imageFlag == 1 && existingPost.photo_url) {
+            const previousImagePath = path.join(__dirname, '..', existingPost.image_url);
+            fs.unlink(previousImagePath, (err) => {
+                if (err) {
+                    console.error('기존 이미지 삭제 오류:', err);
+                } else {
+                    console.log('기존 이미지가 삭제되었습니다:', previousImagePath);
+                }
+            });
+        }
+
         const updatedPost = updatePostModel(postId, title, content, postImage, imageFlag);
         if (!updatedPost) {
             return res.status(404).json({ message: "post_not_found" });
@@ -99,10 +122,10 @@ const updatePostDetail = async (req, res) => {
 };
 
 // 게시글 삭제
-const deletePost = (req, res) => {
+const deletePost = async (req, res) => {
     try {
         const postId = parseInt(req.params.post_id, 10);
-        const isDeleted = deletePostModel(postId);
+        const isDeleted = await deletePostModel(postId);
         if (!isDeleted) {
             return res.status(404).json({ message: "post_not_found" });
         }
