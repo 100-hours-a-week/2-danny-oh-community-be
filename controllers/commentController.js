@@ -1,5 +1,4 @@
 import {
-    getCommentByIdModel,
     addCommentModel,
     editCommentModel,
     deleteCommentModel,

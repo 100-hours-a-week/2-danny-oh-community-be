@@ -1,10 +1,5 @@
 import {
     loadUsersModel,
-    findUserByUserIdModel,
-    addUserModel,
-    updateProfileModel,
-    updatePasswordModel,
-    deleteUserModel,
     generateUserIdModel,
     findUserByEmailModel } from '../models/userModel.js';
 
