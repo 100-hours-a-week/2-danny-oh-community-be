@@ -1,11 +1,12 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+// __dirname 설정 (ES 모듈 환경에서 __dirname 사용)
+
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const postsFilePath = path.join(__dirname, '../posts.json'); // 게시글 JSON 파일 경로
 
-
-
 // 게시글 데이터를 로드하는 함수
-function loadPostsData() {
+function loadPostsDataModel() {
     if (!fs.existsSync(postsFilePath)) {
         fs.writeFileSync(postsFilePath, JSON.stringify([]));
     }
@@ -14,19 +15,19 @@ function loadPostsData() {
 }
 
 // 댓글 데이터를 저장하는 함수
-function savePostsData(posts) {
+function savePostsDataModel(posts) {
     fs.writeFileSync(postsFilePath, JSON.stringify(posts, null, 2));
 }
 
-function getCommentById(post_id, comment_id){
-    const posts = loadPostsData();
+function getCommentByIdModel(post_id, comment_id){
+    const posts = loadPostsDataModel();
     const postIndex = posts.findIndex(post => post.post_id === post_id);
     return posts[postIndex].comments.find(comment => comment.comment_id === comment_id);
 }
 
 // 마지막 comment_id를 확인하여 +1을 반환하는 함수
-function generateCommentId(post_id) {
-    const posts = loadPostsData();
+function generateCommentIdModel(post_id) {
+    const posts = loadPostsDataModel();
     
     // post_id에 해당하는 게시글 찾기
     const post = posts.find(post => post.post_id === post_id);
@@ -44,37 +45,37 @@ function generateCommentId(post_id) {
 }
 
 // 댓글 추가 함수
-function addComment(post_id, newComment) {
+function addCommentModel(post_id, newComment) {
     console.log(newComment);
-    const posts = loadPostsData();
+    const posts = loadPostsDataModel();
     const postIndex = posts.findIndex(post => post.post_id === post_id);
     console.log(posts[postIndex]);
     if (postIndex !== -1) {
         console.log(posts[postIndex]);
         posts[postIndex].comments.push(newComment)
         posts[postIndex].comment_cnt += 1;
-        savePostsData(posts);
+        savePostsDataModel(posts);
         return posts[postIndex].comments;
     }
     return null;
 }
 
 // 댓글 수정 함수
-function editComment(post_id, comment_id, comment){
-    const posts = loadPostsData();
+function editCommentModel(post_id, comment_id, comment){
+    const posts = loadPostsDataModel();
     const postIndex = posts.findIndex(post => post.post_id === post_id);
     if (postIndex !== -1) {
         const commentIndex = posts[postIndex].comments.findIndex(comment => comment.comment_id === comment_id);
         posts[postIndex].comments[commentIndex].content = comment
-        savePostsData(posts);
+        savePostsDataModel(posts);
         return posts[postIndex].comments[commentIndex];
     }
     return null;
 }
 
 // 댓글 삭제 함수
-function deleteComment(post_id, comment_id){
-    const posts = loadPostsData();
+function deleteCommentModel(post_id, comment_id){
+    const posts = loadPostsDataModel();
     const postIndex = posts.findIndex(post => post.post_id === post_id);
     const initialLength = posts[postIndex].comments.length;
     posts[postIndex].comments = posts[postIndex].comments.filter(comment => comment.comment_id !== comment_id);
@@ -87,10 +88,10 @@ function deleteComment(post_id, comment_id){
 }
 
 
-module.exports = {
-    getCommentById,
-    addComment,
-    editComment,
-    deleteComment,
-    generateCommentId
+export {
+    getCommentByIdModel,
+    addCommentModel,
+    editCommentModel,
+    deleteCommentModel,
+    generateCommentIdModel
 };

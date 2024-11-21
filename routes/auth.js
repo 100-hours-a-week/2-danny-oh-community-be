@@ -1,9 +1,15 @@
-const express = require('express');
+import express from 'express';
+import multer from 'multer';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { signUp, login } from '../controllers/authController.js';
+import { generateUserIdModel } from '../models/userModel.js';
+
+// __dirname 설정
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const router = express.Router();
-const authController = require('../controllers/authController');
-const userModel = require('../models/userModel');
-const multer = require('multer');
-const path = require('path');
 
 // Multer 스토리지 설정
 const storage = multer.diskStorage({
@@ -12,7 +18,7 @@ const storage = multer.diskStorage({
         cb(null, uploadPath);
     },
     filename: function (req, file, cb) {
-        const new_id = userModel.generateUserId()
+        const new_id = generateUserIdModel();
         // user_id를 파일명으로 사용, 확장자는 파일 원본 그대로 유지
         cb(null, new_id + path.extname(file.originalname));
     }
@@ -39,7 +45,7 @@ const upload = multer({
 
 // 회원가입 라우트
 router.post('/signup', (req, res, next) => {
-    console.log(req.body);  // 이메일이 잘 넘어오는지 확인
+    console.log(req.body); // 이메일이 잘 넘어오는지 확인
     upload(req, res, function (err) {
         if (err) {
             console.error('파일 업로드 에러:', err);
@@ -49,9 +55,10 @@ router.post('/signup', (req, res, next) => {
             });
         }
         // 파일 업로드 성공 후 회원가입 처리
-        authController.signUp(req, res, next);
+        signUp(req, res, next);
     });
 });
 
-router.post('/login', authController.login);
-module.exports = router;
+router.post('/login', login);
+
+export default router;

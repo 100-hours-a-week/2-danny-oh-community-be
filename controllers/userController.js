@@ -1,4 +1,7 @@
-const userModel = require('../models/userModel');
+import {
+    updateProfileModel,
+    updatePasswordModel,
+    deleteUserModel,} from '../models/userModel.js';
 
 const getUser = (req, res) => {
     try {
@@ -37,7 +40,7 @@ const updateUserProfile = async (req, res) => {
         }
 
         // 사용자 정보 업데이트
-        userModel.updateProfile(user_id, nickname, profileImage, imageFlag);
+        updateProfileModel(user_id, nickname, profileImage, imageFlag);
 
         // 세션에 최신 정보 반영
         req.session.user.nickname = nickname;
@@ -56,7 +59,7 @@ const updateUserPass= (req, res) => {
     try {
         const { user_id } = req.session.user;
         const { newPassword } = req.body;
-        userModel.updatePassword(user_id, newPassword);
+        updatePasswordModel(user_id, newPassword);
         res.status(204).json({ message: '비밀번호가 업데이트되었습니다.' });
     } catch (error) {
         console.error('비밀번호 업데이트 오류:', error);
@@ -68,7 +71,7 @@ const updateUserPass= (req, res) => {
 const deleteUser= (req, res) => {
     try {
         const { user_id } = req.session.user;
-        userModel.deleteUser(user_id);
+        deleteUserModel(user_id);
         req.session.destroy(); // 세션 삭제
         res.status(200).json({ message: '사용자 계정이 삭제되었습니다.' });
     } catch (error) {
@@ -78,5 +81,4 @@ const deleteUser= (req, res) => {
 };
 
 
-
-module.exports = { getUser, updateUserProfile, updateUserPass, deleteUser, logout };
+export { getUser, updateUserProfile, updateUserPass, deleteUser, logout };
