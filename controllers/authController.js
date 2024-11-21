@@ -69,7 +69,7 @@ const login = async (req, res) => {
             user_id: user.user_id,
             email: user.email, 
             nickname: user.nickname, 
-            profileImage: user.profileImage 
+            profileImage: user.image_url 
         };
         res.json({ message: '로그인 성공!' });
     } catch (error) {

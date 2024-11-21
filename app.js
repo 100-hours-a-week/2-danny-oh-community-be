@@ -10,7 +10,6 @@ import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import postRoutes from './routes/post.js';
 import commentRoutes from './routes/comment.js';
-import { connectDB, initializeDatabase } from './db.js';
 
 // __dirname 설정 (ES 모듈 환경에서 __dirname 사용)
 const __filename = fileURLToPath(import.meta.url);
@@ -65,24 +64,6 @@ app.use('/user', userRoutes);
 app.use('/posts', postRoutes);
 app.use('/posts', commentRoutes);
 
-// app.listen(PORT, () => {
-//     console.log(`Server is running on http://localhost:${PORT}`);
-// });
-
-
-// 서버 시작
-const startServer = async () => {
-    try {
-        const dbConnection = await connectDB();
-        await initializeDatabase(dbConnection);
-
-        app.listen(PORT, () => {
-            console.log(`Server is running on http://localhost:${PORT}`);
-        });
-    } catch (err) {
-        console.error('Failed to initialize the server:', err);
-        process.exit(1); // 초기화 실패 시 종료
-    }
-};
-
-startServer();
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+});
