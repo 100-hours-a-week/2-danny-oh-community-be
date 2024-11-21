@@ -28,6 +28,13 @@ const updateUserProfile = async (req, res) => {
         const { user_id } = req.session.user;
         const { nickname, imageFlag } = req.body;
         let profileImage = req.file ? `/uploads/profileImages/${req.file.filename}` : null;
+        // 필수 필드 검증
+        if (!nickname || !imageFlag) {
+            return res.status(400).json({
+                success: false,
+                message: '필수 항목이 누락되었습니다.'
+            });
+        }
         console.log(imageFlag);
         // 이미지 변경이 요청된 경우
         if (imageFlag == 1) {
@@ -59,6 +66,13 @@ const updateUserPass= (req, res) => {
     try {
         const { user_id } = req.session.user;
         const { newPassword } = req.body;
+        // 필수 필드 검증
+        if (!newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: '필수 항목이 누락되었습니다.'
+            });
+        }
         updatePasswordModel(user_id, newPassword);
         res.status(204).json({ message: '비밀번호가 업데이트되었습니다.' });
     } catch (error) {
