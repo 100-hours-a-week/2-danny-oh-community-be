@@ -39,18 +39,7 @@ const upload = multer({
         fileSize: 5 * 1024 * 1024, // 5MB
     },
     fileFilter,
-}).single('postImage');
+}).single('postImage'); // 단일 파일만 처리
 
-// 파일 업로드 함수
-export const uploadPostImage = (req) =>
-    new Promise((resolve, reject) => {
-        upload(req, null, (err) => {
-            if (err) {
-                return reject(err); // 업로드 에러 처리
-            }
-            if (!req.file) {
-                return reject(new Error('파일이 업로드되지 않았습니다.'));
-            }
-            resolve(req.file.filename); // 업로드된 파일명 반환
-        });
-    });
+// 미들웨어로 사용
+export const uploadPostImage = upload;
