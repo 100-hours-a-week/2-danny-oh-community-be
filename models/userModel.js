@@ -6,12 +6,12 @@ const connectDB = await db();  // db()를 호출하여 연결 객체를 가져�
 async function loadUsersModel(email, password) {
     const sql = 'SELECT * FROM users WHERE email = ? AND password = ? AND is_deleted = FALSE';
     const [rows] = await connectDB.query(sql, [email, password]);
-    return rows[0];
+    return rows[0] ? rows[0] : 0;
 }
 
 
 async function findUserByEmailModel(email) {
-    const sql = 'SELECT * FROM users WHERE email = ?';
+    const sql = 'SELECT * FROM users WHERE email = ? AND is_deleted = FALSE';
     const [rows] = await connectDB.query(sql, [email]);
     return rows.length;
 }

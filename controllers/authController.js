@@ -61,7 +61,7 @@ const login = async (req, res) => {
     try {
         const { email, password } = req.body;
         const user = await loadUsersModel(email, password);
-        if (user == 0) {
+        if (user == '0') {
             return res.status(400).json({ message: '잘못된 이메일 또는 비밀번호입니다.' });
         }
         console.log(user);
