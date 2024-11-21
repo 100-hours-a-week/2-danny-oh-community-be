@@ -1,12 +1,17 @@
-const express = require('express');
-const router = express.Router();
-const postController = require('../controllers/postController');
-const postModel = require('../models/postModel');
-const authMiddleware = require('../middleware/authMiddleware');
-const writerMiddleware = require('../middleware/writerMiddleware');
+import express from 'express';
+import multer from 'multer';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { loadPosts, loadPostDetail, createPost, updatePostDetail, deletePost } from '../controllers/postController.js';
+import { generatePostIdModel } from '../models/postModel.js';
+import authMiddleware from '../middleware/authMiddleware.js';
+import writerMiddleware from '../middleware/writerMiddleware.js';
 
-const multer = require('multer');
-const path = require('path');
+// __dirname 설정
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const router = express.Router();
 
 // Multer 스토리지 설정
 const storage = multer.diskStorage({
@@ -15,7 +20,7 @@ const storage = multer.diskStorage({
         cb(null, uploadPath);
     },
     filename: function (req, file, cb) {
-        const new_post_id = postModel.generatePostId();
+        const new_post_id = generatePostIdModel();
         cb(null, new_post_id + path.extname(file.originalname));
     }
 });
@@ -24,7 +29,7 @@ const storage = multer.diskStorage({
 const upload = multer({
     storage: storage,
     limits: {
-        fileSize: 5 * 1024 * 1024 // 5MB
+        fileSize: 5 * 1024 * 1024, // 5MB
     },
     fileFilter: function (req, file, cb) {
         // 이미지 파일 필터링
@@ -36,40 +41,46 @@ const upload = multer({
             return cb(null, true);
         }
         cb(new Error('이미지 파일만 업로드 가능합니다.'));
-    }
+    },
 }).single('postImage');
 
-router.get('/', authMiddleware, postController.loadPosts);
+// 게시물 전체 조회
+router.get('/', authMiddleware, loadPosts);
 
+// 게시물 생성
 router.post('/', authMiddleware, (req, res, next) => {
     upload(req, res, function (err) {
         if (err) {
             console.error('파일 업로드 에러:', err);
             return res.status(400).json({
                 success: false,
-                message: err.message || '파일 업로드 중 에러가 발생했습니다.'
+                message: err.message || '파일 업로드 중 에러가 발생했습니다.',
             });
         }
-        // 파일 업로드 성공 후 업로드 처리
-        postController.createPost(req, res, next);
+        // 파일 업로드 성공 후 처리
+        createPost(req, res, next);
     });
 });
 
-router.get('/:post_id', authMiddleware, postController.loadPostDetail);
-router.patch('/:post_id', authMiddleware,  writerMiddleware, (req, res, next) => {
+// 게시물 상세 조회
+router.get('/:post_id', authMiddleware, loadPostDetail);
+
+// 게시물 수정
+router.patch('/:post_id', authMiddleware, writerMiddleware, (req, res, next) => {
     upload(req, res, function (err) {
         if (err) {
             console.error('파일 업로드 에러:', err);
             return res.status(400).json({
                 success: false,
-                message: err.message || '파일 업로드 중 에러가 발생했습니다.'
+                message: err.message || '파일 업로드 중 에러가 발생했습니다.',
             });
         }
-        
-        // 파일 업로드 성공 후 업로드 처리
-        postController.updatePostDetail(req, res, next);
+        // 파일 업로드 성공 후 처리
+        updatePostDetail(req, res, next);
     });
 });
-router.delete('/:post_id', authMiddleware, writerMiddleware, postController.deletePost);
 
-module.exports = router;
+// 게시물 삭제
+router.delete('/:post_id', authMiddleware, writerMiddleware, deletePost);
+
+export default router;
