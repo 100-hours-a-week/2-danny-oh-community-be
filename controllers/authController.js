@@ -1,7 +1,9 @@
 import {
     loadUsersModel,
-    generateUserIdModel,
     findUserByEmailModel } from '../models/userModel.js';
+
+import { uploadProfileImage } from '../utils/uploadProfileUtils.js';
+
 
 const signUp = async (req, res) => {
     try {
@@ -17,9 +19,8 @@ const signUp = async (req, res) => {
                 message: '필수 항목이 누락되었습니다.'
             });
         }
-        
         // 이미지 경로 처리
-        const profileImage = req.file ? `/uploads/profileImages/${req.file.filename}` : null;
+        const profileImage = req.file ? `/uploads/profileImages/${await uploadProfileImage(req)}` : null;
 
         // 이메일 중복 체크
         if (findUserByEmailModel(email)) {
@@ -28,10 +29,8 @@ const signUp = async (req, res) => {
                 message: '이미 존재하는 이메일입니다.'
             });
         }
-        const user_id = generateUserIdModel();
         // 새 사용자 추가
         const newUser = {
-            user_id,
             email,
             password,
             nickname,
