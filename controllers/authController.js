@@ -1,7 +1,8 @@
 import {
     loadUsersModel,
     generateUserIdModel,
-    findUserByEmailModel } from '../models/userModel.js';
+    findUserByEmailModel, 
+    addUserModel} from '../models/userModel.js';
 
 const signUp = async (req, res) => {
     try {
@@ -38,7 +39,7 @@ const signUp = async (req, res) => {
             profileImage
         };
 
-        userModel.addUser(newUser);
+        addUserModel(newUser);
 
         res.status(201).json({
             success: true,
