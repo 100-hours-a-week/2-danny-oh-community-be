@@ -81,7 +81,7 @@ function deleteCommentModel(post_id, comment_id){
     posts[postIndex].comments = posts[postIndex].comments.filter(comment => comment.comment_id !== comment_id);
     if (posts[postIndex].comments.length < initialLength) {
         posts[postIndex].comment_cnt -= 1;
-        savePostsData(posts);
+        savePostsDataModel(posts);
         return true;
     }
     return null;
