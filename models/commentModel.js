@@ -58,6 +58,7 @@ async function deleteCommentModel(post_id, comment_id){
         const updateSql = `UPDATE posts SET comment_cnt = comment_cnt - 1 WHERE post_id = ?`;
         await connectDB.query(updateSql, [post_id]);
         return 1;
+
     }
 
     return 0; // 삭제 실패 시
