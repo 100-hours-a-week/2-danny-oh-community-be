@@ -7,7 +7,7 @@ async function getAllPostsModel() {
         SELECT p.*, u.nickname, u.email, u.image_url 
         FROM posts p
         JOIN users u ON p.user_id = u.user_id
-        WHERE p.is_deleted = FALSE
+        WHERE p.is_deleted = FALSE AND u.is_deleted = FALSE
         ORDER BY p.created_at DESC
     `;
     const [rows] = await connectDB.query(sql);
@@ -40,16 +40,24 @@ async function getPostByIdModel(postId) {
     `;
     const [post] = await connectDB.query(sql, [postId]);
 
+    const updateSql = `
+        UPDATE posts 
+        SET view_cnt = view_cnt + 1
+        WHERE post_id = ? AND is_deleted = FALSE
+    `;
+    // 조회수 업데이트
+    await connectDB.query(updateSql, [postId]);
+    
     if (post.length === 0) {
         return null;  // 게시글이 존재하지 않으면 null 반환
     }
     console.log(post);
     // 댓글 정보 조회
     const commentSql = `
-        SELECT c.comment_id, c.contents, c.created_at, cu.nickname AS commenter_nickname, cu.image_url AS commenter_image_url
+        SELECT c.user_id, c.comment_id, c.contents, c.created_at, cu.nickname AS commenter_nickname, cu.image_url AS commenter_image_url
         FROM comments c
         JOIN users cu ON c.user_id = cu.user_id
-        WHERE c.post_id = ? AND c.is_deleted = FALSE
+        WHERE c.post_id = ? AND c.is_deleted = FALSE AND cu.is_deleted = FALSE
     `;
     const [commentRows] = await connectDB.query(commentSql, [postId]);
 
