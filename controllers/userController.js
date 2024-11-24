@@ -83,7 +83,7 @@ const updateUserProfile = async (req, res) => {
 
 
 // 사용자 비밀번호 업데이트
-const updateUserPass= (req, res) => {
+const updateUserPass= async (req, res) => {
     try {
         const { user_id } = req.session.user;
         const { newPassword } = req.body;
@@ -94,7 +94,7 @@ const updateUserPass= (req, res) => {
                 message: '필수 항목이 누락되었습니다.'
             });
         }
-        updatePasswordModel(user_id, newPassword);
+        await updatePasswordModel(user_id, newPassword);
         res.status(204).json({ message: '비밀번호가 업데이트되었습니다.' });
     } catch (error) {
         console.error('비밀번호 업데이트 오류:', error);
