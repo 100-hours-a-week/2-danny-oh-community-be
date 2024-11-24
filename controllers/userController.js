@@ -3,6 +3,15 @@ import {
     updatePasswordModel,
     deleteUserModel,} from '../models/userModel.js';
 
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// __dirname 설정
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+
 const getUser = (req, res) => {
     try {
         const user = req.session.user; // 세션에서 사용자 데이터 가져오기
@@ -28,11 +37,30 @@ const updateUserProfile = async (req, res) => {
         const { user_id } = req.session.user;
         const { nickname, imageFlag } = req.body;
         let profileImage = req.file ? `/uploads/profileImages/${req.file.filename}` : null;
-        console.log(imageFlag);
+        // 필수 필드 검증
+        if (!nickname || !imageFlag) {
+            return res.status(400).json({
+                success: false,
+                message: '필수 항목이 누락되었습니다.'
+            });
+        }
+        // 기존 이미지 경로
+        const previousImagePath = req.session.user.profileImage 
+            ? path.join(__dirname, '..', req.session.user.profileImage)
+            : null;
+
         // 이미지 변경이 요청된 경우
         if (imageFlag == 1) {
-            console.log(imageFlag);
-            // 세션에 새로운 프로필 이미지 경로 저장
+            // 기존 이미지 삭제
+            if (previousImagePath) {
+                fs.unlink(previousImagePath, (err) => {
+                    if (err) {
+                        console.error('기존 이미지 삭제 오류:', err);
+                    } else {
+                        console.log('기존 이미지가 삭제되었습니다:', previousImagePath);
+                    }
+                });
+            }
             req.session.user.profileImage = profileImage;
         } else {
             // 이미지 변경이 요청되지 않은 경우 기존 이미지를 유지
@@ -59,6 +87,13 @@ const updateUserPass= (req, res) => {
     try {
         const { user_id } = req.session.user;
         const { newPassword } = req.body;
+        // 필수 필드 검증
+        if (!newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: '필수 항목이 누락되었습니다.'
+            });
+        }
         updatePasswordModel(user_id, newPassword);
         res.status(204).json({ message: '비밀번호가 업데이트되었습니다.' });
     } catch (error) {
@@ -68,10 +103,10 @@ const updateUserPass= (req, res) => {
 };
 
 // 사용자 삭제
-const deleteUser= (req, res) => {
+const deleteUser= async (req, res) => {
     try {
         const { user_id } = req.session.user;
-        deleteUserModel(user_id);
+        await deleteUserModel(user_id);
         req.session.destroy(); // 세션 삭제
         res.status(200).json({ message: '사용자 계정이 삭제되었습니다.' });
     } catch (error) {

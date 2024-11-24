@@ -4,13 +4,18 @@ import {
     getPostByIdModel,
     updatePostModel,
     deletePostModel,
-    generatePostIdModel
 } from '../models/postModel.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
+// __dirname 설정
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 // 모든 게시글 조회
-const loadPosts = (req, res) => {
+const loadPosts = async (req, res) => {
     try {
-        const posts = getAllPostsModel();
+        const posts = await getAllPostsModel();
         res.status(200).json({
             message: "posts_list_success",
             data: {
@@ -22,8 +27,8 @@ const loadPosts = (req, res) => {
                     comment_cnt: post.comment_cnt,
                     view_cnt: post.view_cnt,
                     author: {
-                        user_id: post.author.user_id,
-                        nickname: post.author.nickname
+                        user_id: post.user_id,
+                        nickname: post.nickname
                     },
                     created_at: post.created_at
                 }))
@@ -36,32 +41,22 @@ const loadPosts = (req, res) => {
 };
 
 // controllers/postController.js
-const createPost = (req, res) => {
+const createPost = async (req, res) => {
     try {
         console.log(req.body);
         const { title, content } = req.body;
 
         // 이미지 경로 처리
         const postImage = req.file ? `/uploads/postImages/${req.file.filename}` : null;
-        const post_id = generatePostIdModel()
-        // 작성자 정보와 댓글 구조를 미리 설정
-        const author = {
-            user_id: req.session.user.user_id, // 세션에 저장된 user_id 사용
-            nickname: req.session.user.nickname,
-            profileImage: req.session.user.profileImage || null
-        };
 
         const newPost = {
-            post_id,
             title,
             content,
             postImage,
             like_cnt: 0,
             comment_cnt: 0,
             view_cnt: 0,
-            author,
-            created_at: new Date().toISOString().replace('T', ' ').slice(0, 19),
-            comments: [], // 기본적으로 빈 댓글 배열로 시작
+            user_id: req.session.user.user_id,
         };
 
         // 새 게시글 데이터 저장
@@ -76,12 +71,12 @@ const createPost = (req, res) => {
 
 
 // 특정 게시글 조회
-const loadPostDetail = (req, res) => {
+const loadPostDetail = async (req, res) => {
     try {
         const postId = parseInt(req.params.post_id, 10);
-        const post = getPostByIdModel(postId);
+        const post = await getPostByIdModel(postId);
         if (!post) {
-            return res.status(404).json({ message: "post_not_found" });
+           return res.status(404).json({ message: "post_not_found" });
         }
         res.status(200).json({ message: "post_detail_success", data: post });
     } catch (error) {
@@ -91,11 +86,30 @@ const loadPostDetail = (req, res) => {
 };
 
 // 게시글 수정
-const updatePostDetail = (req, res) => {
+const updatePostDetail = async (req, res) => {
     try {
         const postId = parseInt(req.params.post_id, 10);
         const { title, content, imageFlag } = req.body;
         const postImage = req.file ? `/uploads/postImages/${req.file.filename}` : null;
+
+        // 기존 게시글 데이터 가져오기
+        const existingPost = await getPostByIdModel(postId);
+        if (!existingPost) {
+            return res.status(404).json({ message: "post_not_found" });
+        }
+
+        // 기존 이미지 삭제
+        if (imageFlag == 1 && existingPost.photo_url) {
+            const previousImagePath = path.join(__dirname, '..', existingPost.image_url);
+            fs.unlink(previousImagePath, (err) => {
+                if (err) {
+                    console.error('기존 이미지 삭제 오류:', err);
+                } else {
+                    console.log('기존 이미지가 삭제되었습니다:', previousImagePath);
+                }
+            });
+        }
+
         const updatedPost = updatePostModel(postId, title, content, postImage, imageFlag);
         if (!updatedPost) {
             return res.status(404).json({ message: "post_not_found" });
@@ -108,10 +122,10 @@ const updatePostDetail = (req, res) => {
 };
 
 // 게시글 삭제
-const deletePost = (req, res) => {
+const deletePost = async (req, res) => {
     try {
         const postId = parseInt(req.params.post_id, 10);
-        const isDeleted = deletePostModel(postId);
+        const isDeleted = await deletePostModel(postId);
         if (!isDeleted) {
             return res.status(404).json({ message: "post_not_found" });
         }

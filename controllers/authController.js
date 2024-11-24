@@ -1,8 +1,8 @@
 import {
     loadUsersModel,
-    generateUserIdModel,
     findUserByEmailModel, 
     addUserModel} from '../models/userModel.js';
+
 
 const signUp = async (req, res) => {
     try {
@@ -18,28 +18,25 @@ const signUp = async (req, res) => {
                 message: '필수 항목이 누락되었습니다.'
             });
         }
-        
         // 이미지 경로 처리
         const profileImage = req.file ? `/uploads/profileImages/${req.file.filename}` : null;
 
         // 이메일 중복 체크
-        if (findUserByEmailModel(email)) {
+        if ( await findUserByEmailModel(email) > 0) {
             return res.status(400).json({
                 success: false,
                 message: '이미 존재하는 이메일입니다.'
             });
         }
-        const user_id = generateUserIdModel();
         // 새 사용자 추가
         const newUser = {
-            user_id,
             email,
             password,
             nickname,
             profileImage
         };
 
-        addUserModel(newUser);
+        await addUserModel(newUser);
 
         res.status(201).json({
             success: true,
@@ -60,20 +57,19 @@ const signUp = async (req, res) => {
     }
 };
 
-const login = (req, res) => {
+const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-        const user = loadUsersModel().find(user => user.email === email && user.password === password);
-
-        if (!user) {
+        const user = await loadUsersModel(email, password);
+        if (user == '0') {
             return res.status(400).json({ message: '잘못된 이메일 또는 비밀번호입니다.' });
         }
-
+        console.log(user);
         req.session.user = { 
             user_id: user.user_id,
             email: user.email, 
             nickname: user.nickname, 
-            profileImage: user.profileImage 
+            profileImage: user.image_url 
         };
         res.json({ message: '로그인 성공!' });
     } catch (error) {
