@@ -13,6 +13,7 @@ const db = async () => {
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
             database: process.env.DB_NAME,
+            dateStrings: true // 날짜를 문자열로 반환
         });
 
         console.log('Connected to the database.');
