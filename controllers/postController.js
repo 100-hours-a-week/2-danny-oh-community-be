@@ -4,6 +4,7 @@ import {
     getPostByIdModel,
     updatePostModel,
     deletePostModel,
+    likePostModel
 } from '../models/postModel.js';
 import fs from 'fs';
 import path from 'path';
@@ -121,6 +122,22 @@ const updatePostDetail = async (req, res) => {
     }
 };
 
+const likePost = async (req, res) => {
+    try{
+        const postId = parseInt(req.params.post_id, 10);
+        const updatedPost = await likePostModel(postId)
+
+        if (!updatedPost) {
+            return res.status(404).json({ message: "post_not_found" });
+        }
+        res.status(204).json({ message: "post_like_success", data: updatedPost });
+    }
+    catch (error){
+        console.error("게시글 좋아요 오류:", error);
+        res.status(500).json({ message: "internal_server_error" });
+    }
+}
+
 // 게시글 삭제
 const deletePost = async (req, res) => {
     try {
@@ -136,4 +153,4 @@ const deletePost = async (req, res) => {
     }
 };
 
-export { loadPosts, createPost, loadPostDetail, updatePostDetail, deletePost };
+export { loadPosts, createPost, loadPostDetail, updatePostDetail, deletePost, likePost };
