@@ -39,15 +39,6 @@ async function getPostByIdModel(postId) {
         WHERE p.post_id = ? AND p.is_deleted = FALSE
     `;
     const [post] = await connectDB.query(sql, [postId]);
-
-    const updateSql = `
-        UPDATE posts 
-        SET view_cnt = view_cnt + 1
-        WHERE post_id = ? AND is_deleted = FALSE
-    `;
-    // 조회수 업데이트
-    await connectDB.query(updateSql, [postId]);
-
     if (post.length === 0) {
         return null;  // 게시글이 존재하지 않으면 null 반환
     }
@@ -89,6 +80,16 @@ async function getPostByIdModel(postId) {
     };
 }
 
+async function viewCountModel(postId) {
+    const updateSql = `
+    UPDATE posts 
+    SET view_cnt = view_cnt + 1
+    WHERE post_id = ? AND is_deleted = FALSE
+    `;
+    // 조회수 업데이트
+    await connectDB.query(updateSql, [postId]);
+}
+
 // 게시글 업데이트 함수
 async function updatePostModel(postId, title, content, postImage, imageFlag) {
     let sql = 'UPDATE posts SET title = ?, contents = ?, updated_at = Now()';
@@ -127,5 +128,6 @@ export {
     getPostByIdModel,
     updatePostModel,
     deletePostModel,
-    likePostModel
+    likePostModel,
+    viewCountModel
 };

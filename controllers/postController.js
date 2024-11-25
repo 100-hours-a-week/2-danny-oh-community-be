@@ -4,7 +4,8 @@ import {
     getPostByIdModel,
     updatePostModel,
     deletePostModel,
-    likePostModel
+    likePostModel,
+    viewCountModel
 } from '../models/postModel.js';
 import fs from 'fs';
 import path from 'path';
@@ -122,6 +123,18 @@ const updatePostDetail = async (req, res) => {
     }
 };
 
+const viewcntPost = async (req, res) => {
+    try{
+        const postId = parseInt(req.params.post_id, 10);
+        await viewCountModel(postId)
+        res.status(204).json({ message: "increase_view_cnt" });
+    }
+    catch (error){
+        console.error("게시글 좋아요 오류:", error);
+        res.status(500).json({ message: "internal_server_error" });
+    }
+}
+
 const likePost = async (req, res) => {
     try{
         const postId = parseInt(req.params.post_id, 10);
@@ -153,4 +166,4 @@ const deletePost = async (req, res) => {
     }
 };
 
-export { loadPosts, createPost, loadPostDetail, updatePostDetail, deletePost, likePost };
+export { loadPosts, createPost, loadPostDetail, updatePostDetail, deletePost, likePost, viewcntPost };
