@@ -1,7 +1,8 @@
 import {
     loadUsersModel,
     findUserByEmailModel, 
-    addUserModel} from '../models/userModel.js';
+    addUserModel,
+    findUserByNicknamelModel} from '../models/userModel.js';
 
 
 const signUp = async (req, res) => {
@@ -28,6 +29,14 @@ const signUp = async (req, res) => {
                 message: '이미 존재하는 이메일입니다.'
             });
         }
+
+        if ( await findUserByNicknamelModel(nickname) > 0) {
+            return res.status(401).json({
+                success: false,
+                message: '이미 존재하는 닉네임입니다.'
+            });
+        }
+
         // 새 사용자 추가
         const newUser = {
             email,

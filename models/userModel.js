@@ -16,6 +16,12 @@ async function findUserByEmailModel(email) {
     return rows.length;
 }
 
+async function findUserByNicknamelModel(nickname) {
+    const sql = 'SELECT * FROM users WHERE nickname = ? AND is_deleted = FALSE';
+    const [rows] = await connectDB.query(sql, [nickname]);
+    return rows.length;
+}
+
 async function findUserByUserIdModel(user_id) {
     const sql = `SELECT * FROM users WHERE user_id = ?`
     const [rows] = await connectDB.query(sql, [user_id]);
@@ -77,5 +83,6 @@ export {
     updateProfileModel,
     updatePasswordModel,
     deleteUserModel,
-    findUserByEmailModel
+    findUserByEmailModel,
+    findUserByNicknamelModel
 };
