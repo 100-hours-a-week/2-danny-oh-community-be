@@ -64,6 +64,28 @@ app.use('/user', userRoutes);
 app.use('/posts', postRoutes);
 app.use('/posts', commentRoutes);
 
+// 현재 접속자 목록 출력
+app.get('/active-users', (req, res) => {
+    const sessionStore = req.sessionStore;
+
+    sessionStore.all((err, sessions) => {
+        if (err) {
+            return res.status(500).json({ error: 'Failed to retrieve sessions' });
+        }
+
+        // 세션 데이터에서 user 정보가 있는 경우 닉네임과 프로필 이미지 주소만 추출
+        const activeUsers = Object.values(sessions)
+            .filter((session) => session.user) // user 데이터가 있는 세션만 필터링
+            .map((session) => ({
+                nickname: session.user.nickname,
+                profileImage: session.user.profileImage,
+            }));
+
+        res.json(activeUsers); // 필터링된 결과를 JSON 형태로 반환
+    });
+});
+
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
