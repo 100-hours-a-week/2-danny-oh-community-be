@@ -44,6 +44,16 @@ const updateUserProfile = async (req, res) => {
                 message: '필수 항목이 누락되었습니다.'
             });
         }
+        
+        const existingUserCount = await findUserByNicknamelModel(nickname);
+
+        if (existingUserCount >= 1 && nickname !== req.session.nickname) {
+            return res.status(401).json({
+                success: false,
+                message: '이미 존재하는 닉네임입니다.',
+            });
+        }
+
         // 기존 이미지 경로
         const previousImagePath = req.session.user.profileImage 
             ? path.join(__dirname, '..', req.session.user.profileImage)
