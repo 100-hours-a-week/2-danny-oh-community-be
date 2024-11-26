@@ -1,7 +1,8 @@
 import {
     updateProfileModel,
     updatePasswordModel,
-    deleteUserModel,} from '../models/userModel.js';
+    deleteUserModel,
+    findUserByNicknamelModel} from '../models/userModel.js';
 
 import fs from 'fs';
 import path from 'path';
