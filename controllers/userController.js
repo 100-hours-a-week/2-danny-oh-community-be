@@ -48,7 +48,7 @@ const updateUserProfile = async (req, res) => {
         
         const existingUserCount = await findUserByNicknamelModel(nickname);
 
-        if (existingUserCount >= 1 && nickname !== req.session.nickname) {
+        if (existingUserCount >= 1 && nickname != req.session.nickname) {
             return res.status(401).json({
                 success: false,
                 message: '이미 존재하는 닉네임입니다.',
