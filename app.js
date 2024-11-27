@@ -10,6 +10,9 @@ import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import postRoutes from './routes/post.js';
 import commentRoutes from './routes/comment.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // __dirname 설정 (ES 모듈 환경에서 __dirname 사용)
 const __filename = fileURLToPath(import.meta.url);
@@ -49,7 +52,7 @@ app.use(
 // cors 설정
 app.use(
     cors({
-        origin: 'http://localhost:3000', // 클라이언트 도메인
+        origin: `http://${process.env.DB_NAME}:3000`, // 클라이언트 도메인
         credentials: true, // 쿠키를 포함한 요청 허용
     })
 );
@@ -87,5 +90,5 @@ app.get('/active-users', (req, res) => {
 
 
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Server is running on http://${process.env.DB_NAME}:${PORT}`);
 });
