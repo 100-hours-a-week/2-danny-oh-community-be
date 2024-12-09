@@ -4,12 +4,12 @@ import {
     addUserModel,
     findUserByNicknamelModel} from '../models/userModel.js';
 
-import multer from 'multer';
-import FormData from 'form-data'; // Form-Data 라이브러리
+import FormData from 'form-data';
 import fetch from 'node-fetch';
+import dotenv from 'dotenv';
 
-// Multer 메모리 저장소 설정
-const upload = multer({ storage: multer.memoryStorage() });
+dotenv.config();
+
 
 const signUp = async (req, res) => {
     try {
@@ -42,7 +42,7 @@ const signUp = async (req, res) => {
             try {
                 const formData = new FormData();
                 formData.append('file', req.file.buffer, req.file.originalname); // 버퍼와 파일 이름 사용
-                const response = await fetch(`http://localhost:4000/upload/profileImage`, {
+                const response = await fetch(`http://${process.env.STORAGE_SERVER}/upload/profileImage`, {
                     method: 'POST',
                     body: formData,
                 });

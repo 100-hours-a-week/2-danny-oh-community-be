@@ -94,15 +94,12 @@ async function viewCountModel(postId) {
 async function updatePostModel(postId, title, content, postImage, imageFlag) {
     let sql = 'UPDATE posts SET title = ?, contents = ?, updated_at = Now()';
     const values = [title, content];
-    console.log(imageFlag);
     if (imageFlag == 1) {
         sql += ', photo_url = ?';
         values.push(postImage);
     }
-
     sql += ' WHERE post_id = ?';
     values.push(postId);
-
     const [result] = await connectDB.query(sql, values);
     return result.affectedRows > 0;  // 업데이트 성공 여부 반환
 }
