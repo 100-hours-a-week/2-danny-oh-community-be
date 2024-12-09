@@ -15,20 +15,20 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // __dirname 설정 (ES 모듈 환경에서 __dirname 사용)
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
 // 업로드 디렉토리 생성
-const uploadDir1 = path.join(__dirname, 'uploads/profileImages');
-const uploadDir2 = path.join(__dirname, 'uploads/postImages');
+// const uploadDir1 = path.join(__dirname, 'uploads/profileImages');
+// const uploadDir2 = path.join(__dirname, 'uploads/postImages');
 
-if (!fs.existsSync(uploadDir1)) {
-    fs.mkdirSync(uploadDir1, { recursive: true });
-}
+// if (!fs.existsSync(uploadDir1)) {
+//     fs.mkdirSync(uploadDir1, { recursive: true });
+// }
 
-if (!fs.existsSync(uploadDir2)) {
-    fs.mkdirSync(uploadDir2, { recursive: true });
-}
+// if (!fs.existsSync(uploadDir2)) {
+//     fs.mkdirSync(uploadDir2, { recursive: true });
+// }
 
 const app = express();
 const PORT = 8000;
