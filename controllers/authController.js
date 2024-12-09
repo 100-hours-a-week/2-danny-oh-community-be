@@ -4,14 +4,17 @@ import {
     addUserModel,
     findUserByNicknamelModel} from '../models/userModel.js';
 
+import FormData from 'form-data';
+import fetch from 'node-fetch';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 
 const signUp = async (req, res) => {
     try {
-        console.log('회원가입 처리 시작', req.body);
-        console.log('업로드된 파일:', req.file);
-
         const { email, password, nickname } = req.body;
-        
+        let profileImage;
         // 필수 필드 검증
         if (!email || !password || !nickname) {
             return res.status(400).json({
@@ -19,8 +22,6 @@ const signUp = async (req, res) => {
                 message: '필수 항목이 누락되었습니다.'
             });
         }
-        // 이미지 경로 처리
-        const profileImage = req.file ? `/uploads/profileImages/${req.file.filename}` : null;
 
         // 이메일 중복 체크
         if ( await findUserByEmailModel(email) > 0) {
@@ -35,6 +36,27 @@ const signUp = async (req, res) => {
                 success: false,
                 message: '이미 존재하는 닉네임입니다.'
             });
+        }
+
+        if (req.file){
+            try {
+                const formData = new FormData();
+                formData.append('file', req.file.buffer, req.file.originalname); // 버퍼와 파일 이름 사용
+                const response = await fetch(`http://${process.env.STORAGE_SERVER}/upload/profileImage`, {
+                    method: 'POST',
+                    body: formData,
+                });
+                if (response.status === 200) {
+                    const data = await response.json();
+                    profileImage = data.fileUrl;
+                } else {
+                    console.error('이미지 업로드 실패:', response.status);
+                }
+            } catch (uploadError) {
+                console.error('이미지 업로드 중 오류 발생:', uploadError);
+            }
+        } else{
+            profileImage = null;
         }
 
         // 새 사용자 추가

@@ -52,7 +52,7 @@ app.use(
 // cors 설정
 app.use(
     cors({
-        origin: `http://${process.env.DB_NAME}:3000`, // 클라이언트 도메인
+        origin: `http://${process.env.ADDRESS}:3000`, // 클라이언트 도메인
         credentials: true, // 쿠키를 포함한 요청 허용
     })
 );
@@ -90,5 +90,5 @@ app.get('/active-users', (req, res) => {
 
 
 app.listen(PORT, () => {
-    console.log(`Server is running on http://${process.env.DB_NAME}:${PORT}`);
+    console.log(`Server is running on http://${process.env.ADDRESS}:${PORT}`);
 });
