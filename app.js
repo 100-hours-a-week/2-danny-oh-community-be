@@ -31,12 +31,25 @@ app.use(
 );
 
 // cors 설정
+const allowedOrigins = [
+    `http://${process.env.ADDRESS}`, // 환경 변수로 설정된 도메인
+    `http://${process.env.STORAGE_SERVER}`,      // 추가 도메인
+];
+
 app.use(
     cors({
-        origin: `http://${process.env.ADDRESS}`, // 클라이언트 도메인
-        credentials: true, // 쿠키를 포함한 요청 허용
+        origin: (origin, callback) => {
+            // 요청한 origin이 허용된 도메인에 포함되거나, origin이 없을 때(예: CORS 미사용 요청)
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error('Not allowed by CORS'));
+            }
+        },
+        credentials: true, // 쿠키 허용
     })
 );
+
 
 app.use('/auth', authRoutes);
 app.use('/user', userRoutes);
