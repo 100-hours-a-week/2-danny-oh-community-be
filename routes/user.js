@@ -5,7 +5,11 @@ import authMiddleware from '../middleware/authMiddleware.js';
 import { uploadProfileImage } from '../utils/uploadProfileUtils.js';
 
 // Multer 메모리 저장소 설정
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+});
+
 const router = express.Router();
 
 router.get('/', authMiddleware, getUser);
