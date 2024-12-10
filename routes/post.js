@@ -5,7 +5,11 @@ import authMiddleware from '../middleware/authMiddleware.js';
 import writerMiddleware from '../middleware/writerMiddleware.js';
 import { uploadPostImage } from '../utils/uploadPostUtils.js';
 
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+});
+
 const router = express.Router();
 
 router.get('/', authMiddleware, loadPosts);
