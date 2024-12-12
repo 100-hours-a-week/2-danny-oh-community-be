@@ -7,7 +7,6 @@ const upload = multer({
     storage: multerS3({
         s3: s3,
         bucket: process.env.S3_BUCKET_NAME,
-        acl: 'public-read', // 업로드된 파일을 공개로 설정
         key: function (req, file, cb) {
             const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
             cb(null, `postImages/${uniqueSuffix}${path.extname(file.originalname)}`);
