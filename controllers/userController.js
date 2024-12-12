@@ -45,7 +45,7 @@ const updateUserProfile = async (req, res) => {
                 message: '이미 존재하는 닉네임입니다.',
             });
         }
-        const profileImage = req.file ? req.file.location : null;
+        const profileImage = req.file ? `https://d1nq974808g33j.cloudfront.net/${req.file.key}` : null;
 
         // 이미지 변경이 요청된 경우
         if (imageFlag == 1) {
