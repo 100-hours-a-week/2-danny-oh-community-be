@@ -1,45 +1,26 @@
 import multer from 'multer';
+import multerS3 from 'multer-s3';
 import path from 'path';
-import { fileURLToPath } from 'url';
-import crypto from 'crypto';
+import s3 from './s3Client.js';
 
-// __dirname 설정
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Multer 스토리지 설정
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        const uploadPath = path.join(__dirname, '../uploads/profileImages');
-        cb(null, uploadPath);
-    },
-    filename: function (req, file, cb) {
-        // 랜덤 파일명 생성
-        const randomName = crypto.randomBytes(16).toString('hex');
-        const extension = path.extname(file.originalname);
-        cb(null, `${randomName}${extension}`);
+const upload = multer({
+    storage: multerS3({
+        s3: s3,
+        bucket: process.env.S3_BUCKET_NAME,
+        acl: 'public-read', // 업로드된 파일을 공개로 설정
+        key: function (req, file, cb) {
+            const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+            cb(null, `profileImages/${uniqueSuffix}${path.extname(file.originalname)}`);
+        },
+        contentType: multerS3.AUTO_CONTENT_TYPE,
+    }),
+    fileFilter: function (req, file, cb) {
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('이미지 파일이 아님'), false);
+        }
     },
 });
 
-const fileFilter = (req, file, cb) => {
-    const filetypes = /jpeg|jpg|png/;
-    const mimetype = filetypes.test(file.mimetype);
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-
-    if (mimetype && extname) {
-        return cb(null, true);
-    }
-    cb(new Error('이미지 파일만 업로드 가능합니다.'));
-};
-
-// Multer 인스턴스 생성
-const upload = multer({
-    storage,
-    limits: {
-        fileSize: 5 * 1024 * 1024, // 5MB
-    },
-    fileFilter,
-}).single('profileImage'); // 단일 파일만 처리
-
-// 미들웨어로 사용
-export const uploadProfileImage = upload;
+export default upload;

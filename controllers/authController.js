@@ -4,17 +4,10 @@ import {
     addUserModel,
     findUserByNicknamelModel} from '../models/userModel.js';
 
-import FormData from 'form-data';
-import fetch from 'node-fetch';
-import dotenv from 'dotenv';
-
-dotenv.config();
-
 
 const signUp = async (req, res) => {
     try {
         const { email, password, nickname } = req.body;
-        let profileImage;
         // 필수 필드 검증
         if (!email || !password || !nickname) {
             return res.status(400).json({
@@ -38,26 +31,7 @@ const signUp = async (req, res) => {
             });
         }
 
-        if (req.file){
-            try {
-                const formData = new FormData();
-                formData.append('file', req.file.buffer, req.file.originalname); // 버퍼와 파일 이름 사용
-                const response = await fetch(`http://${process.env.STORAGE_SERVER}/upload/profileImage`, {
-                    method: 'POST',
-                    body: formData,
-                });
-                if (response.status === 200) {
-                    const data = await response.json();
-                    profileImage = data.fileUrl;
-                } else {
-                    console.error('이미지 업로드 실패:', response.status);
-                }
-            } catch (uploadError) {
-                console.error('이미지 업로드 중 오류 발생:', uploadError);
-            }
-        } else{
-            profileImage = null;
-        }
+        const profileImage = req.file ? req.file.location : null;
 
         // 새 사용자 추가
         const newUser = {
