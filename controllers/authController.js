@@ -31,7 +31,7 @@ const signUp = async (req, res) => {
             });
         }
 
-        const profileImage = req.file ? req.file.location : null;
+        const profileImage = req.file ? `https://d1nq974808g33j.cloudfront.net/${req.file.key}` : null;
 
         // 새 사용자 추가
         const newUser = {

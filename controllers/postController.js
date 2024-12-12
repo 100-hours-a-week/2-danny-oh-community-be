@@ -41,7 +41,7 @@ const createPost = async (req, res) => {
     try {
         console.log(req.body);
         const { title, content } = req.body;
-        const postImage = req.file ? req.file.location : null;
+        const postImage = req.file ? `https://d1nq974808g33j.cloudfront.net/${req.file.key}` : null;
 
         const newPost = {
             title,
@@ -84,7 +84,7 @@ const updatePostDetail = async (req, res) => {
     try {
         const postId = parseInt(req.params.post_id, 10);
         const { title, content, imageFlag } = req.body;
-        const postImage = req.file ? req.file.location : null;
+        const postImage = req.file ? `https://d1nq974808g33j.cloudfront.net/${req.file.key}` : null;
         // 기존 게시글 데이터 가져오기
         const existingPost = await getPostByIdModel(postId);
         if (!existingPost) {
