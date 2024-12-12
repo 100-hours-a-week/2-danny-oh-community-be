@@ -4,20 +4,6 @@ import {
     deleteUserModel,
     findUserByNicknamelModel} from '../models/userModel.js';
 
-// import fs from 'fs';
-// import path from 'path';
-// import { fileURLToPath } from 'url';
-import FormData from 'form-data';
-import fetch from 'node-fetch';
-import dotenv from 'dotenv';
-
-dotenv.config();
-
-// __dirname 설정
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
-
-
 const getUser = (req, res) => {
     try {
         const user = req.session.user; // 세션에서 사용자 데이터 가져오기
@@ -43,8 +29,6 @@ const updateUserProfile = async (req, res) => {
         const { user_id } = req.session.user;
         const { nickname, imageFlag } = req.body;
 
-        let profileImage
-
         // 필수 필드 검증
         if (!nickname || !imageFlag) {
             return res.status(400).json({
@@ -61,44 +45,10 @@ const updateUserProfile = async (req, res) => {
                 message: '이미 존재하는 닉네임입니다.',
             });
         }
-        if (req.file){
-            try {
-                const formData = new FormData();
-                formData.append('file', req.file.buffer, req.file.originalname); // 버퍼와 파일 이름 사용
-                const response = await fetch(`http://${process.env.STORAGE_SERVER}/upload/profileImage`, {
-                    method: 'POST',
-                    body: formData,
-                });
-                if (response.status === 200) {
-                    const data = await response.json();
-                    profileImage = data.fileUrl;
-                } else {
-                    console.error('이미지 업로드 실패:', response.status);
-                }
-            } catch (uploadError) {
-                console.error('이미지 업로드 중 오류 발생:', uploadError);
-            }
-        } else{
-            profileImage = null;
-        }
-
-        // 기존 이미지 경로
-        // const previousImagePath = req.session.user.profileImage 
-        //     ? path.join(__dirname, '..', req.session.user.profileImage)
-        //     : null;
+        const profileImage = req.file ? req.file.location : null;
 
         // 이미지 변경이 요청된 경우
         if (imageFlag == 1) {
-            // 기존 이미지 삭제
-            // if (previousImagePath) {
-            //     fs.unlink(previousImagePath, (err) => {
-            //         if (err) {
-            //             console.error('기존 이미지 삭제 오류:', err);
-            //         } else {
-            //             console.log('기존 이미지가 삭제되었습니다:', previousImagePath);
-            //         }
-            //     });
-            // }
             req.session.user.profileImage = profileImage;
         } else {
             // 이미지 변경이 요청되지 않은 경우 기존 이미지를 유지
