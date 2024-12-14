@@ -2,7 +2,7 @@ import {
     loadUsersModel,
     findUserByEmailModel, 
     addUserModel,
-    findUserByNicknamelModel} from '../models/userModel.js';
+    findUserByNicknameModel} from '../models/userModel.js';
 
 
 const signUp = async (req, res) => {
@@ -24,7 +24,7 @@ const signUp = async (req, res) => {
             });
         }
 
-        if ( await findUserByNicknamelModel(nickname) > 0) {
+        if ( await findUserByNicknameModel(nickname) > 0) {
             return res.status(401).json({
                 success: false,
                 message: '이미 존재하는 닉네임입니다.'

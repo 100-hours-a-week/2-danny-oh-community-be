@@ -2,7 +2,7 @@ import {
     updateProfileModel,
     updatePasswordModel,
     deleteUserModel,
-    findUserByNicknamelModel} from '../models/userModel.js';
+    findUserByNicknameModel} from '../models/userModel.js';
 
 const getUser = (req, res) => {
     try {
@@ -37,7 +37,7 @@ const updateUserProfile = async (req, res) => {
             });
         }
         
-        const existingUserCount = await findUserByNicknamelModel(nickname);
+        const existingUserCount = await findUserByNicknameModel(nickname);
 
         if (existingUserCount >= 1 && nickname !== req.session.user.nickname) {
             return res.status(401).json({
