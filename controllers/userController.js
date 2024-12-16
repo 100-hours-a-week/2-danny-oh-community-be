@@ -50,9 +50,6 @@ const updateUserProfile = async (req, res) => {
         // 이미지 변경이 요청된 경우
         if (imageFlag == 1) {
             req.session.user.profileImage = profileImage;
-        } else {
-            // 이미지 변경이 요청되지 않은 경우 기존 이미지를 유지
-            profileImage = req.session.user.profileImage || null;
         }
 
         // 사용자 정보 업데이트
