@@ -32,7 +32,7 @@ app.use(
 
 // cors 설정
 const allowedOrigins = [
-    `http://${process.env.ADDRESS}`, // 환경 변수로 설정된 도메인
+    `http://13.209.17.149`, // 환경 변수로 설정된 도메인
     `http://${process.env.STORAGE_SERVER}`,      // 추가 도메인
 ];
 
