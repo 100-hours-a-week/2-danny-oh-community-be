@@ -47,6 +47,18 @@ jobs:
           host: ${{ secrets.HOST }} # ip
           username: ${{ secrets.USER }} # 해당 유저 접속 
           script: | # 실행 할 코드
+
+          - name: ssh to ec2 # ec2에 접속하라.(필수 아님)
+        uses: appleboy/ssh-action@master # 접속 제공 코드
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }} # 키페어 필요
+          host: ${{ secrets.HOST }} # ip
+          username: ${{ secrets.USER }} # 해당 유저 접속 
+          script: | # 실행 할 코드
+            aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 183295438985.dkr.ecr.ap-northeast-2.amazonaws.com
+            
+            # Pull 최신 이미지
+            docker pull 183295438985.dkr.ecr.ap-northeast-2.amazonaws.com/community-fe:0.1
             # Pull 최신 이미지
             docker pull 183295438985.dkr.ecr.ap-northeast-2.amazonaws.com/community-be:0.1
 
