@@ -1,0 +1,83 @@
+name: CI/CD Pipeline for ECR and EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    name: Build, Push to ECR, Deploy on EC2
+    runs-on: ubuntu-22.04
+
+    env:
+      ECR_REGISTRY: 183295438985.dkr.ecr.ap-northeast-2.amazonaws.com
+      ECR_REPOSITORY: community-be
+      IMAGE_TAG: 0.1
+
+    steps:
+      # 1. Repository 체크아웃
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. AWS 인증 설정
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.ECR_USER_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.ECR_USER_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.ECR_USER_REGION }}
+
+      # 3. ECR 로그인
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password --region ${{ secrets.ECR_USER_REGION }} | docker login --username AWS --password-stdin $ECR_REGISTRY
+
+      # 4. Docker 이미지 빌드 및 ECR 푸시
+      - name: Build, tag, and push image to Amazon ECR
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      # 5. EC2 서버에 SSH로 접근 및 배포
+      - name: ssh to ec2 # ec2에 접속하라.(필수 아님)
+        uses: appleboy/ssh-action@master # 접속 제공 코드
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }} # 키페어 필요
+          host: ${{ secrets.HOST }} # ip
+          username: ${{ secrets.USER }} # 해당 유저 접속 
+          script: | # 실행 할 코드
+            # Pull 최신 이미지
+            docker pull 183295438985.dkr.ecr.ap-northeast-2.amazonaws.com/community-be:0.1
+
+            # Nginx 설정 파일 경로
+            NGINX_CONFIG=/etc/nginx/sites-enabled/default
+            
+            # 기존 컨테이너 확인 및 포트 설정
+            PORT=8000
+            OTHER_PORT=8001
+
+            if docker ps | grep -q "0.0.0.0:8001"; then
+              PORT=8000
+              OTHER_PORT=8001
+              BG_MODE=blue
+            else
+              PORT=8001
+              OTHER_PORT=8000
+              BG_MODE=green
+            fi
+
+            # 새 컨테이너 실행
+            docker run -d -p $PORT:8000 --name community-be-$PORT 183295438985.dkr.ecr.ap-northeast-2.amazonaws.com/community-be:0.1
+
+            # nginx 설정 변경
+            sudo sed -i "s|set \$active_backend backend-.*;|set \$active_backend backend-$BG_MODE;|g" $NGINX_CONFIG
+            sudo systemctl reload nginx
+            
+            # 기존 컨테이너 중지 및 삭제
+            if docker ps | grep -q "0.0.0.0:$OTHER_PORT"; then
+              docker stop community-be-$OTHER_PORT
+              docker rm community-be-$OTHER_PORT
+            fi
+            
+            echo "배포완료"
