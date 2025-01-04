@@ -10,8 +10,10 @@ import {
 
 // 모든 게시글 조회
 const loadPosts = async (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 8;
     try {
-        const posts = await getAllPostsModel();
+        const posts = await getAllPostsModel(page, limit);
         res.status(200).json({
             message: "posts_list_success",
             data: {
