@@ -1,19 +1,22 @@
 import pool from '../db.js'; // 연결 풀 가져오기
 
 // 게시글 전체 조회 함수
-async function getAllPostsModel() {
+async function getAllPostsModel(page, limit) {
+    const offset = (page - 1) * limit; // OFFSET 계산
+
     const sql = `
         SELECT p.*, u.nickname, u.email, u.image_url 
         FROM posts p
         JOIN users u ON p.user_id = u.user_id
         WHERE p.is_deleted = FALSE AND u.is_deleted = FALSE
         ORDER BY p.created_at DESC
+        LIMIT ? OFFSET ?
     `;
 
     let connection;
     try {
         connection = await pool.getConnection();
-        const [rows] = await connection.query(sql);
+        const [rows] = await connection.query(sql, [limit, offset]); // limit와 offset을 쿼리에 전달
         return rows;
     } catch (error) {
         console.error('Error fetching posts:', error);
