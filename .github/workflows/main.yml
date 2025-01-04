@@ -83,10 +83,9 @@ jobs:
             sudo sed -i "s|set \$active_backend backend-.*;|set \$active_backend backend-$BG_MODE;|g" $NGINX_CONFIG
             sudo systemctl reload nginx
             
-            # 기존 컨테이너 중지 및 삭제
-            if docker ps | grep -q "0.0.0.0:$OTHER_PORT"; then
-              docker stop community-be-$OTHER_PORT
-              docker rm community-be-$OTHER_PORT
-            fi
+          
+            docker stop community-be-$OTHER_PORT
+            docker rm community-be-$OTHER_PORT
+
             
             echo "배포완료"
