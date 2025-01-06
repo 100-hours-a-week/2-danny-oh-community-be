@@ -47,7 +47,10 @@ jobs:
           host: ${{ secrets.HOST }} # ip
           username: ${{ secrets.USER }} # 해당 유저 접속 
           script: | # 실행 할 코드
-
+            
+            # aws 로그인
+            aws ecr get-login-password --region ${{ secrets.ECR_USER_REGION }} | docker login --username AWS --password-stdin 183295438985.dkr.ecr.${{ secrets.ECR_USER_REGION }}.amazonaws.com
+            
             # Pull 최신 이미지
             docker pull 183295438985.dkr.ecr.ap-northeast-2.amazonaws.com/community-be:0.1
 
