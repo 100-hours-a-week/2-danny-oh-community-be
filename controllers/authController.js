@@ -65,25 +65,48 @@ const signUp = async (req, res) => {
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
+
+        // 사용자 인증
         const user = await loadUsersModel(email, password);
         if (user == '0') {
             return res.status(400).json({ message: '잘못된 이메일 또는 비밀번호입니다.' });
         }
+
         console.log(user);
-        req.session.user = { 
+
+        // 기존 세션 제거
+        const sessionStore = req.sessionStore;
+        if (sessionStore && sessionStore.sessions) {
+            Object.entries(sessionStore.sessions).forEach(([sessionId, sessionData]) => {
+                const parsedData = JSON.parse(sessionData); // 세션 데이터는 JSON 문자열로 저장됨
+                if (parsedData.user && parsedData.user.user_id === user.user_id) {
+                    console.log(`기존 세션 제거: ${sessionId}`);
+                    sessionStore.destroy(sessionId, (err) => {
+                        if (err) {
+                            console.error('세션 제거 중 오류:', err);
+                        }
+                    });
+                }
+            });
+        }
+
+        // 새 세션 설정
+        req.session.user = {
             user_id: user.user_id,
-            email: user.email, 
-            nickname: user.nickname, 
-            profileImage: user.image_url 
+            email: user.email,
+            nickname: user.nickname,
+            profileImage: user.image_url,
         };
+
         res.json({ message: '로그인 성공!' });
     } catch (error) {
         console.error('로그인 에러:', error);
         res.status(500).json({
             success: false,
-            message: '서버 오류가 발생했습니다.'
+            message: '서버 오류가 발생했습니다.',
         });
     }
 };
+
 
 export { signUp, login };
