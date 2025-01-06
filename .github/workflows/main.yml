@@ -72,7 +72,7 @@ jobs:
             fi
 
             # 새 컨테이너 실행
-            docker run -d -p $PORT:8000 --name community-be-$PORT 183295438985.dkr.ecr.ap-northeast-2.amazonaws.com/community-be:0.1
+            docker run -d -p $PORT:8000 --env-file .env --name community-be-$PORT 183295438985.dkr.ecr.ap-northeast-2.amazonaws.com/community-be:0.1
 
             # nginx 설정 변경
             sudo sed -i "s|set \$active_backend backend-.*;|set \$active_backend backend-$BG_MODE;|g" $NGINX_CONFIG
