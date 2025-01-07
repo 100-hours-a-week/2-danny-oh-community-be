@@ -18,6 +18,9 @@ DB_NAME = '데이터베이스 이름'
 아래 쿼리문을 통해 테이블을 생성해 주세요
 
 ```sql
+-- 테이블 순서는 관계를 고려하여 한 번에 실행해도 에러가 발생하지 않게 정렬되었습니다.
+USE community;
+-- member Table Create SQL
 -- 테이블 생성 SQL - member
 CREATE TABLE users
 (
@@ -32,6 +35,8 @@ CREATE TABLE users
      PRIMARY KEY (user_id)
 );
 
+
+-- posts Table Create SQL
 -- 테이블 생성 SQL - posts
 CREATE TABLE posts
 (
@@ -49,12 +54,17 @@ CREATE TABLE posts
      PRIMARY KEY (post_id)
 );
 
+-- Foreign Key 설정 SQL - posts(user_fk) -> users(user_id)
 ALTER TABLE posts
     ADD CONSTRAINT  FOREIGN KEY (user_id)
         REFERENCES users (user_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 
+-- Foreign Key 삭제 SQL - posts(user_fk)
+-- ALTER TABLE posts
+-- DROP FOREIGN KEY ;
 
 
+-- comments Table Create SQL
 -- 테이블 생성 SQL - comments
 CREATE TABLE comments
 (
@@ -68,13 +78,35 @@ CREATE TABLE comments
      PRIMARY KEY (comment_id)
 );
 
+-- Foreign Key 설정 SQL - comments(user_fk) -> member(user_id)
 ALTER TABLE comments
     ADD CONSTRAINT  FOREIGN KEY (user_id)
         REFERENCES users (user_id) ON DELETE RESTRICT ON UPDATE CASCADE;
 
+-- Foreign Key 삭제 SQL - comments(user_fk)
+-- ALTER TABLE comments
+-- DROP FOREIGN KEY ;
+
+-- Foreign Key 설정 SQL - comments(post_fk) -> posts(post_id)
 ALTER TABLE comments
     ADD CONSTRAINT  FOREIGN KEY (post_id)
         REFERENCES posts (post_id) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- Foreign Key 삭제 SQL - comments(post_fk)
+-- ALTER TABLE comments
+-- DROP FOREIGN KEY ;
+
+CREATE TABLE likes (
+    `like_id`    INT         NOT NULL    AUTO_INCREMENT COMMENT '좋아요 ID',
+    `user_id`    INT         NOT NULL    COMMENT '회원 참조 키',
+    `post_id`    INT         NOT NULL    COMMENT '게시글 참조 키',
+    `created_at` DATETIME    NOT NULL    DEFAULT CURRENT_TIMESTAMP COMMENT '좋아요 시간',
+    PRIMARY KEY (like_id),
+    UNIQUE KEY (user_id, post_id),
+    FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (post_id) REFERENCES posts (post_id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 
 ```
 
