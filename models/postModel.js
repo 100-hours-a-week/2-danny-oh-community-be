@@ -144,7 +144,7 @@ async function viewCountModel(postId) {
 async function updatePostModel(postId, title, content, postImage, imageFlag) {
     let sql = 'UPDATE posts SET title = ?, contents = ?, updated_at = Now()';
     const values = [title, content];
-    if (imageFlag === 1) {
+    if (imageFlag == 1) {
         sql += ', photo_url = ?';
         values.push(postImage);
     }
