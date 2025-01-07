@@ -24,6 +24,7 @@ const logout = (req, res) => {
     }
 }
 
+import deleteFile from '../utils/deleteProfileUtils.js';
 const updateUserProfile = async (req, res) => {
     try {
         const { user_id } = req.session.user;
@@ -47,15 +48,19 @@ const updateUserProfile = async (req, res) => {
         }
         const profileImage = req.file ? `https://d1nq974808g33j.cloudfront.net/${req.file.key}` : null;
 
-        // 이미지 변경이 요청된 경우
-        if (imageFlag == 1) {
-            req.session.user.profileImage = profileImage;
-        }
-
         // 사용자 정보 업데이트
         updateProfileModel(user_id, nickname, profileImage, imageFlag);
-
+        
         // 세션에 최신 정보 반영
+        
+        // 이미지 변경이 요청된 경우
+        if (imageFlag == 1) {
+            if (req.session.user.profileImage){
+                const fileKey = req.session.user.profileImage.replace('https://d1nq974808g33j.cloudfront.net/', '');
+                deleteFile(fileKey);
+            }
+            req.session.user.profileImage = profileImage;
+        }
         req.session.user.nickname = nickname;
 
         res.status(204).json({ message: '프로필이 업데이트되었습니다.' });
@@ -64,7 +69,6 @@ const updateUserProfile = async (req, res) => {
         res.status(500).json({ message: '서버 오류가 발생했습니다.' });
     }
 };
-
 
 
 // 사용자 비밀번호 업데이트
@@ -93,6 +97,12 @@ const deleteUser= async (req, res) => {
         const { user_id } = req.session.user;
         await deleteUserModel(user_id);
         req.session.destroy(); // 세션 삭제
+
+        // 프로필 이미지 삭제
+        if (req.session.user.profileImage){
+            const fileKey = req.session.user.profileImage.replace('https://d1nq974808g33j.cloudfront.net/', '');
+            deleteFile(fileKey);
+        }
         res.status(200).json({ message: '사용자 계정이 삭제되었습니다.' });
     } catch (error) {
         console.error('사용자 삭제 오류:', error);

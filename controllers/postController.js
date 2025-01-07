@@ -38,7 +38,7 @@ const loadPosts = async (req, res) => {
     }
 };
 
-// controllers/postController.js
+// 게시글 작성
 const createPost = async (req, res) => {
     try {
         console.log(req.body);
@@ -81,11 +81,19 @@ const loadPostDetail = async (req, res) => {
     }
 };
 
+import deleteFile from '../utils/deletePostUtils.js';
 // 게시글 수정
 const updatePostDetail = async (req, res) => {
     try {
         const postId = parseInt(req.params.post_id, 10);
         const { title, content, imageFlag } = req.body;
+        if (imageFlag == 1) {
+            const post = await getPostByIdModel(postId);
+            if (post.postImage){
+                const fileKey = post.postImage.replace('https://d1nq974808g33j.cloudfront.net/', '');
+                deleteFile(fileKey);
+            }
+        }
         const postImage = req.file ? `https://d1nq974808g33j.cloudfront.net/${req.file.key}` : null;
         // 기존 게시글 데이터 가져오기
         const existingPost = await getPostByIdModel(postId);
@@ -104,7 +112,8 @@ const updatePostDetail = async (req, res) => {
     }
 };
 
-const viewcntPost = async (req, res) => {
+// 조회수
+const viewCntPost = async (req, res) => {
     try{
         const postId = parseInt(req.params.post_id, 10);
         await viewCountModel(postId)
@@ -116,29 +125,40 @@ const viewcntPost = async (req, res) => {
     }
 }
 
+// 좋아요
 const likePost = async (req, res) => {
-    try{
+    try {
         const postId = parseInt(req.params.post_id, 10);
-        const updatedPost = await likePostModel(postId)
+        const { user_id } = req.session.user; // 세션에서 user_id 가져오기
+        // 좋아요 처리 (좋아요 추가/취소 및 최신 like_cnt 반환)
+        const { likeCount, isLiked } = await likePostModel(postId, user_id);
 
-        if (!updatedPost) {
-            return res.status(404).json({ message: "post_not_found" });
-        }
-        res.status(204).json({ message: "post_like_success", data: updatedPost });
-    }
-    catch (error){
+        // 좋아요 처리 결과 반환
+        res.status(200).json({
+            likeCount,
+            isLiked, // true: 좋아요 추가됨, false: 좋아요 취소됨
+        });
+    } catch (error) {
         console.error("게시글 좋아요 오류:", error);
         res.status(500).json({ message: "internal_server_error" });
     }
-}
+};
+
 
 // 게시글 삭제
 const deletePost = async (req, res) => {
     try {
         const postId = parseInt(req.params.post_id, 10);
+        const post = await getPostByIdModel(postId);
+        if (post.postImage){
+            const fileKey = post.postImage.replace('https://d1nq974808g33j.cloudfront.net/', '');
+        }
         const isDeleted = await deletePostModel(postId);
         if (!isDeleted) {
             return res.status(404).json({ message: "post_not_found" });
+        }
+        if (post.postImage){
+            deleteFile(fileKey);
         }
         res.status(200).json({ message: "post_deleted_success" });
     } catch (error) {
@@ -147,4 +167,4 @@ const deletePost = async (req, res) => {
     }
 };
 
-export { loadPosts, createPost, loadPostDetail, updatePostDetail, deletePost, likePost, viewcntPost };
+export { loadPosts, createPost, loadPostDetail, updatePostDetail, deletePost, likePost, viewCntPost };
