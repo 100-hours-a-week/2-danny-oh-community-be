@@ -113,7 +113,7 @@ const updatePostDetail = async (req, res) => {
 };
 
 // 조회수
-const viewcntPost = async (req, res) => {
+const viewCntPost = async (req, res) => {
     try{
         const postId = parseInt(req.params.post_id, 10);
         await viewCountModel(postId)
@@ -127,20 +127,23 @@ const viewcntPost = async (req, res) => {
 
 // 좋아요
 const likePost = async (req, res) => {
-    try{
+    try {
         const postId = parseInt(req.params.post_id, 10);
         const { user_id } = req.session.user; // 세션에서 user_id 가져오기
-        const updatedPost = await likePostModel(postId, user_id);
-        if (!updatedPost) {
-            return res.status(404).json({ message: "post_not_found" });
-        }
-        res.status(204).json({ message: "post_like_success", data: updatedPost });
-    }
-    catch (error){
+        // 좋아요 처리 (좋아요 추가/취소 및 최신 like_cnt 반환)
+        const { likeCount, isLiked } = await likePostModel(postId, user_id);
+
+        // 좋아요 처리 결과 반환
+        res.status(200).json({
+            likeCount,
+            isLiked, // true: 좋아요 추가됨, false: 좋아요 취소됨
+        });
+    } catch (error) {
         console.error("게시글 좋아요 오류:", error);
         res.status(500).json({ message: "internal_server_error" });
     }
-}
+};
+
 
 // 게시글 삭제
 const deletePost = async (req, res) => {
@@ -164,4 +167,4 @@ const deletePost = async (req, res) => {
     }
 };
 
-export { loadPosts, createPost, loadPostDetail, updatePostDetail, deletePost, likePost, viewcntPost };
+export { loadPosts, createPost, loadPostDetail, updatePostDetail, deletePost, likePost, viewCntPost };

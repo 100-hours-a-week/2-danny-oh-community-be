@@ -164,22 +164,77 @@ async function updatePostModel(postId, title, content, postImage, imageFlag) {
     }
 }
 
-// 게시글 좋아요 함수
-async function likePostModel(postId) {
-    const sql = 'UPDATE posts SET like_cnt = like_cnt + 1 WHERE post_id = ?';
+async function likePostCheckModel(postId, userId) {
+    const checkLikeSql = 'SELECT COUNT(*) AS count FROM likes WHERE user_id = ? AND post_id = ?';
 
     let connection;
     try {
         connection = await pool.getConnection();
-        const [result] = await connection.query(sql, [postId]);
-        return result.affectedRows > 0;
+
+        // 좋아요 상태 확인
+        const [result] = await connection.query(checkLikeSql, [userId, postId]);
+        const isLiked = result[0].count > 0;
+
+        return isLiked ? 1 : 0; // 1: 좋아요 상태, 0: 좋아요 상태 아님
     } catch (error) {
-        console.error('Error liking post:', error);
+        console.error('Error checking like status:', error);
         throw error;
     } finally {
         if (connection) connection.release();
     }
 }
+
+
+async function likePostModel(postId, userId) {
+    const checkLikeSql = 'SELECT * FROM likes WHERE user_id = ? AND post_id = ?';
+    const insertLikeSql = 'INSERT INTO likes (user_id, post_id) VALUES (?, ?)';
+    const deleteLikeSql = 'DELETE FROM likes WHERE user_id = ? AND post_id = ?';
+    const incrementLikeCountSql = 'UPDATE posts SET like_cnt = like_cnt + 1 WHERE post_id = ?';
+    const decrementLikeCountSql = 'UPDATE posts SET like_cnt = like_cnt - 1 WHERE post_id = ?';
+    const getLikeCountSql = 'SELECT like_cnt FROM posts WHERE post_id = ?';
+
+    let connection;
+    try {
+        connection = await pool.getConnection();
+
+        // 트랜잭션 시작
+        await connection.beginTransaction();
+
+        // 좋아요 상태 확인
+        const [likeResult] = await connection.query(checkLikeSql, [userId, postId]);
+        const isLiked = likeResult.length > 0;
+
+        if (isLiked) {
+            // 좋아요 취소
+            await connection.query(deleteLikeSql, [userId, postId]);
+            await connection.query(decrementLikeCountSql, [postId]);
+        } else {
+            // 좋아요 추가
+            await connection.query(insertLikeSql, [userId, postId]);
+            await connection.query(incrementLikeCountSql, [postId]);
+        }
+
+        // 현재 좋아요 수 조회
+        const [likeCountResult] = await connection.query(getLikeCountSql, [postId]);
+        const likeCount = likeCountResult[0]?.like_cnt || 0;
+
+        // 트랜잭션 커밋
+        await connection.commit();
+
+        return { isLiked: !isLiked, likeCount }; // isLiked: true(좋아요 추가), false(좋아요 취소)
+    } catch (error) {
+        if (connection) {
+            await connection.rollback(); // 트랜잭션 롤백
+        }
+
+        console.error('Error toggling like:', error);
+        throw error;
+    } finally {
+        if (connection) connection.release();
+    }
+}
+
+
 
 // 게시글 삭제 함수
 async function deletePostModel(postId) {
@@ -207,4 +262,5 @@ export {
     deletePostModel,
     likePostModel,
     viewCountModel,
+    likePostCheckModel
 };
