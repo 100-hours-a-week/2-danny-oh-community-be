@@ -109,7 +109,7 @@ async function addUserModel(user) {
 async function updateProfileModel(user_id, nickname, profileImage, imageFlag) {
     let sql, params;
 
-    if (imageFlag === 1) {
+    if (imageFlag == 1) {
         sql = `
             UPDATE users 
             SET nickname = ?, image_url = ?, updated_at = NOW() 

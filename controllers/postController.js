@@ -28,7 +28,8 @@ const loadPosts = async (req, res) => {
                         user_id: post.user_id,
                         nickname: post.nickname
                     },
-                    created_at: post.created_at
+                    created_at: post.created_at,
+                    updated_at: post.updated_at
                 }))
             }
         });
@@ -152,13 +153,11 @@ const deletePost = async (req, res) => {
         const post = await getPostByIdModel(postId);
         if (post.postImage){
             const fileKey = post.postImage.replace('https://d1nq974808g33j.cloudfront.net/', '');
+            deleteFile(fileKey);
         }
         const isDeleted = await deletePostModel(postId);
         if (!isDeleted) {
             return res.status(404).json({ message: "post_not_found" });
-        }
-        if (post.postImage){
-            deleteFile(fileKey);
         }
         res.status(200).json({ message: "post_deleted_success" });
     } catch (error) {

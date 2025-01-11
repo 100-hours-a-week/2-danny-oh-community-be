@@ -94,15 +94,14 @@ const updateUserPass= async (req, res) => {
 // 사용자 삭제
 const deleteUser= async (req, res) => {
     try {
-        const { user_id } = req.session.user;
+        const { user_id, profileImage } = req.session.user;
         await deleteUserModel(user_id);
-        req.session.destroy(); // 세션 삭제
-
         // 프로필 이미지 삭제
         if (req.session.user.profileImage){
-            const fileKey = req.session.user.profileImage.replace('https://d1nq974808g33j.cloudfront.net/', '');
+            const fileKey = profileImage.replace('https://d1nq974808g33j.cloudfront.net/', '');
             deleteFile(fileKey);
         }
+        req.session.destroy(); // 세션 삭제
         res.status(200).json({ message: '사용자 계정이 삭제되었습니다.' });
     } catch (error) {
         console.error('사용자 삭제 오류:', error);

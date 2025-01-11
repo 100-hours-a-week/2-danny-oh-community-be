@@ -72,7 +72,7 @@ async function getPostByIdModel(postId) {
         WHERE p.post_id = ? AND p.is_deleted = FALSE
     `;
     const commentSql = `
-        SELECT c.user_id, c.comment_id, c.contents, c.created_at, cu.nickname AS commenter_nickname, cu.image_url AS commenter_image_url
+        SELECT c.user_id, c.comment_id, c.contents, c.created_at, cu.nickname AS commenter_nickname, cu.image_url AS commenter_image_url, c.updated_at
         FROM comments c
         JOIN users cu ON c.user_id = cu.user_id
         WHERE c.post_id = ? AND c.is_deleted = FALSE AND cu.is_deleted = FALSE
@@ -101,6 +101,7 @@ async function getPostByIdModel(postId) {
                 profileImage: post[0].author_image_url,
             },
             created_at: post[0].created_at,
+            updated_at: post[0].updated_at,
             comments: comments.map((comment) => ({
                 comment_id: comment.comment_id,
                 content: comment.contents,
@@ -110,6 +111,7 @@ async function getPostByIdModel(postId) {
                     profileImage: comment.commenter_image_url,
                 },
                 created_at: comment.created_at,
+                updated_at: comment.updated_at
             })),
         };
     } catch (error) {
