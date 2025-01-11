@@ -28,7 +28,8 @@ const loadPosts = async (req, res) => {
                         user_id: post.user_id,
                         nickname: post.nickname
                     },
-                    created_at: post.created_at
+                    created_at: post.created_at,
+                    updated_at: post.updated_at
                 }))
             }
         });
