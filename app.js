@@ -25,6 +25,7 @@ app.use(
         cookie: {
             secure: false, // 로컬 환경에서는 false로 설정
             httpOnly: true, // 자바스크립트로 쿠키를 접근할 수 없도록 설정
+            sameSite: 'Lax',
             maxAge: 60 * 60 * 1000, // 쿠키 만료 시간 설정
         },
     })
