@@ -25,7 +25,7 @@ app.use(
         cookie: {
             secure: false, // 로컬 환경에서는 false로 설정
             httpOnly: true, // 자바스크립트로 쿠키를 접근할 수 없도록 설정
-            sameSite: 'Lax',
+            sameSite: 'true',
             maxAge: 60 * 60 * 1000, // 쿠키 만료 시간 설정
         },
     })
@@ -33,7 +33,7 @@ app.use(
 
 // cors 설정
 const allowedOrigins = [
-    `http://${process.env.ADDRESS}`, // 환경 변수로 설정된 도메인
+    `http://danny-fe-env.eba-vqxdbjmq.ap-northeast-2.elasticbeanstalk.com`, // 환경 변수로 설정된 도메인
     `http://${process.env.STORAGE_SERVER}`,      // 추가 도메인
 ];
 
