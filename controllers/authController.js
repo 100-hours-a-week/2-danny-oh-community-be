@@ -65,7 +65,7 @@ const signUp = async (req, res) => {
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-
+        req.session.destroy(); // 세션 삭제
         // 사용자 인증
         const user = await loadUsersModel(email, password);
         if (user == '0') {
@@ -73,22 +73,6 @@ const login = async (req, res) => {
         }
 
         console.log(user);
-
-        // 기존 세션 제거
-        const sessionStore = req.sessionStore;
-        if (sessionStore && sessionStore.sessions) {
-            Object.entries(sessionStore.sessions).forEach(([sessionId, sessionData]) => {
-                const parsedData = JSON.parse(sessionData); // 세션 데이터는 JSON 문자열로 저장됨
-                if (parsedData.user && parsedData.user.user_id === user.user_id) {
-                    console.log(`기존 세션 제거: ${sessionId}`);
-                    sessionStore.destroy(sessionId, (err) => {
-                        if (err) {
-                            console.error('세션 제거 중 오류:', err);
-                        }
-                    });
-                }
-            });
-        }
 
         // 새 세션 설정
         req.session.user = {
