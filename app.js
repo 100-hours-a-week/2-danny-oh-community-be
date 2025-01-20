@@ -35,7 +35,9 @@ app.use(
 const allowedOrigins = [
     `http://${process.env.ADDRESS}`, // 환경 변수로 설정된 도메인
     `http://${process.env.STORAGE_SERVER}`,      // 추가 도메인
-    'http://awseb--AWSEB-6pzQmyYHcBsG-1260531892.ap-northeast-2.elb.amazonaws.com'    
+    'http://awseb--AWSEB-6pzQmyYHcBsG-1260531892.ap-northeast-2.elb.amazonaws.com'
+    `http://43.201.249.100`,
+    `http://3.34.196.27`    
 ];
 
 app.use(
