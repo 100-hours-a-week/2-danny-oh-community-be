@@ -68,35 +68,33 @@ const login = async (req, res) => {
 
         // 사용자 인증
         const user = await loadUsersModel(email, password);
-        if (user == '0') {
-            return res.status(400).json({ message: '잘못된 이메일 또는 비밀번호입니다.' });
+        if (user) {console.log(user);
+            // 기존 세션 제거
+            const sessionStore = req.sessionStore;
+            if (sessionStore && sessionStore.sessions) {
+                Object.entries(sessionStore.sessions).forEach(([sessionId, sessionData]) => {
+                    const parsedData = JSON.parse(sessionData); // 세션 데이터는 JSON 문자열로 저장됨
+                    if (parsedData.user && parsedData.user.user_id === user.user_id) {
+                        console.log(`기존 세션 제거: ${sessionId}`);
+                        sessionStore.destroy(sessionId, (err) => {
+                            if (err) {
+                                console.error('세션 제거 중 오류:', err);
+                            }
+                        });
+                    }
+                });
+            }
+            req.session.user = { 
+                user_id: user.user_id,
+                email: user.email, 
+                nickname: user.nickname, 
+                profileImage: user.image_url 
+            };
+            res.json({ message: '로그인 성공!' }); 
+        }else{
+            console.log(user);
+            res.status(500).json({ message: '잘못된 이메일 또는 비밀번호입니다.' });                              
         }
-
-        console.log(user);
-
-        // 기존 세션 제거
-        const sessionStore = req.sessionStore;
-        if (sessionStore && sessionStore.sessions) {
-            Object.entries(sessionStore.sessions).forEach(([sessionId, sessionData]) => {
-                const parsedData = JSON.parse(sessionData); // 세션 데이터는 JSON 문자열로 저장됨
-                if (parsedData.user && parsedData.user.user_id === user.user_id) {
-                    console.log(`기존 세션 제거: ${sessionId}`);
-                    sessionStore.destroy(sessionId, (err) => {
-                        if (err) {
-                            console.error('세션 제거 중 오류:', err);
-                        }
-                    });
-                }
-            });
-        }
-
-        req.session.user = { 
-            user_id: user.user_id,
-            email: user.email, 
-            nickname: user.nickname, 
-            profileImage: user.image_url 
-        };
-        res.json({ message: '로그인 성공!' });
     } catch (error) {
         console.error('로그인 에러:', error);
         res.status(500).json({
