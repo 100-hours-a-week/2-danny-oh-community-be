@@ -25,7 +25,7 @@ app.use(
         cookie: {
             secure: false, // 로컬 환경에서는 false로 설정
             httpOnly: true, // 자바스크립트로 쿠키를 접근할 수 없도록 설정
-            sameSite: 'Lax',
+            sameSite: 'None',
             maxAge: 60 * 60 * 1000, // 쿠키 만료 시간 설정
         },
     })
@@ -35,7 +35,9 @@ app.use(
 const allowedOrigins = [
     `http://${process.env.ADDRESS}`, // 환경 변수로 설정된 도메인
     `http://${process.env.STORAGE_SERVER}`,      // 추가 도메인
-    'http://awseb--AWSEB-6pzQmyYHcBsG-1260531892.ap-northeast-2.elb.amazonaws.com'    
+    'http://awseb--AWSEB-6pzQmyYHcBsG-1260531892.ap-northeast-2.elb.amazonaws.com'
+    `http://43.201.249.100`,
+    `http://3.34.196.27`    
 ];
 
 app.use(
