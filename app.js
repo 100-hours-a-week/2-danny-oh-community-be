@@ -33,10 +33,10 @@ app.use(
 
 // cors 설정
 const allowedOrigins = [
-    `http://${process.env.ADDRESS}`, // 환경 변수로 설정된 도메인
-    `http://${process.env.STORAGE_SERVER}`,      // 추가 도메인
-    `http://43.201.249.100`,
-    `http://3.34.196.27`,
+    `http://${process.env.ADDRESS}`, // 프론트서버
+    `http://${process.env.ADDRESS2}`, // 프론트서버
+    `http://${process.env.STORAGE_SERVER}`, // 데베서버
+
 ];
 
 app.use(
