@@ -35,8 +35,6 @@ app.use(
 const allowedOrigins = [
     `http://${process.env.ADDRESS}`, // 프론트서버
     `http://${process.env.ADDRESS2}`, // 프론트서버
-    `http://${process.env.STORAGE_SERVER}`, // 데베서버
-
 ];
 
 app.use(
