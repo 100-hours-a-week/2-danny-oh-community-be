@@ -44,6 +44,7 @@ app.use(
             if (!origin || allowedOrigins.includes(origin)) {
                 callback(null, true);
             } else {
+                console.error(`CORS 차단: origin=${origin}`); // 차단된 origin 로그
                 callback(new Error('Not allowed by CORS'));
             }
         },
