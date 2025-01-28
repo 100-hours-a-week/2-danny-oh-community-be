@@ -3,7 +3,7 @@ import {
     findUserByEmailModel, 
     addUserModel,
     findUserByNicknameModel} from '../models/userModel.js';
-
+import axios from 'axios';
 
 const signUp = async (req, res) => {
     try {
@@ -104,4 +104,47 @@ const login = async (req, res) => {
     }
 };
 
-export { signUp, login };
+const kakao = async (req, res) => {
+    const { code } = req.query; // 카카오에서 전달된 인증 코드
+
+    try {
+        // Access Token 요청
+        const tokenResponse = await axios.post(
+            'https://kauth.kakao.com/oauth/token',
+            null,
+            {
+                params: {
+                    grant_type: 'authorization_code',
+                    client_id: '460b66b189d9e6618b2397d5522cdcfa', // 환경 변수에서 Client ID 가져오기
+                    redirect_uri: 'http://13.209.17.149/api/auth/kakao', // 등록된 Redirect URI
+                    code, // 전달된 인증 코드
+                },
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            }
+        );
+
+        const accessToken = tokenResponse.data.access_token;
+
+        // 사용자 정보 요청
+        const userResponse = await axios.get('https://kapi.kakao.com/v2/user/me', {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        });
+        const user = userResponse.data;
+        req.session.user = { 
+            user_id: user.user_id,
+            email: 'test.test', 
+            nickname: user.properties.nickname, 
+            profileImage: user.properties.thumbnail_image 
+        };
+        res.redirect('/posts');
+    } catch (error) {
+        console.error('카카오 로그인 실패:', error.response?.data || error.message);
+        res.status(500).json({
+            message: '카카오 로그인 실패',
+            error: error.response?.data || error.message,
+        });
+    }
+};
+export { signUp, login, kakao };
