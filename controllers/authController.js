@@ -133,7 +133,7 @@ const kakao = async (req, res) => {
         });
         const user = userResponse.data;
         req.session.user = { 
-            user_id: user.user_id,
+            user_id: user.id,
             email: 'test.test', 
             nickname: user.properties.nickname, 
             profileImage: user.properties.thumbnail_image 
