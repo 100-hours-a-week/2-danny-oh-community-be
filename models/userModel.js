@@ -63,6 +63,27 @@ async function findUserByNicknameModel(nickname) {
     }
 }
 
+// 닉네임으로 사용자 찾기 (카카오)
+async function findKakaoUserByNicknameModel(nickname) {
+    const sql = `
+        SELECT user_id 
+        FROM users 
+        WHERE email = 'kakao' AND nickname = ? AND is_deleted = FALSE
+    `;
+
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        const [rows] = await connection.query(sql, [nickname]);
+        return rows.length > 0 ? rows[0].user_id : -1; // 사용자가 있으면 user_id 반환, 없으면 0 반환
+    } catch (error) {
+        console.error('Error finding user by nickname:', error);
+        throw error;
+    } finally {
+        if (connection) connection.release();
+    }
+}
+
 // 사용자 ID로 사용자 정보 가져오기
 async function findUserByUserIdModel(user_id) {
     const sql = `
@@ -183,6 +204,7 @@ async function deleteUserModel(user_id) {
 export {
     loadUsersModel,
     findUserByUserIdModel,
+    findKakaoUserByNicknameModel,
     addUserModel,
     updateProfileModel,
     updatePasswordModel,
