@@ -117,7 +117,7 @@ const kakao = async (req, res) => {
                 params: {
                     grant_type: 'authorization_code',
                     client_id: '460b66b189d9e6618b2397d5522cdcfa', // 환경 변수에서 Client ID 가져오기
-                    redirect_uri: 'http://13.209.17.149/auth/kakao', // 등록된 Redirect URI
+                    redirect_uri: 'http://13.209.17.149/api/auth/kakao', // 등록된 Redirect URI
                     code, // 전달된 인증 코드
                 },
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
