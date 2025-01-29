@@ -2,7 +2,8 @@ import {
     loadUsersModel,
     findUserByEmailModel, 
     addUserModel,
-    findUserByNicknameModel} from '../models/userModel.js';
+    findUserByNicknameModel,
+    findKakaoUserByNicknameModel} from '../models/userModel.js';
 import axios from 'axios';
 
 const signUp = async (req, res) => {
@@ -116,7 +117,7 @@ const kakao = async (req, res) => {
                 params: {
                     grant_type: 'authorization_code',
                     client_id: '460b66b189d9e6618b2397d5522cdcfa', // 환경 변수에서 Client ID 가져오기
-                    redirect_uri: 'http://13.209.17.149/api/auth/kakao', // 등록된 Redirect URI
+                    redirect_uri: 'http://13.209.17.149/auth/kakao', // 등록된 Redirect URI
                     code, // 전달된 인증 코드
                 },
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -132,9 +133,25 @@ const kakao = async (req, res) => {
             },
         });
         const user = userResponse.data;
+        let user_id = await findKakaoUserByNicknameModel(user.properties.nickname);
+
+        if (user_id == -1){
+            // 새 사용자 추가
+            const newUser = {
+                email : 'kakao',
+                password : '카카오 로그인 유저입니다',
+                nickname : user.properties.nickname,
+                profileImage : user.properties.thumbnail_image 
+            };
+
+            await addUserModel(newUser);
+        }
+
+        user_id = await findKakaoUserByNicknameModel(user.properties.nickname);
+
         req.session.user = { 
-            user_id: user.id,
-            email: 'test.test', 
+            user_id: user_id,
+            email: 'kakao', 
             nickname: user.properties.nickname, 
             profileImage: user.properties.thumbnail_image 
         };
